@@ -1,0 +1,39 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <div class="panel p-10 text-center">
+    <Layouts.coin_icon class="size-16 text-gold mx-auto" />
+    <h1 class="font-cinzel font-bold text-4xl text-gold mt-4">{gettext("It Does Cost A Lot")}</h1>
+    <p class="text-muted italic mt-2 text-lg">
+      {gettext("Chart the coin of your realm — income, expense, and the balance between.")}
+    </p>
+
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <%= if @current_scope do %>
+        <.link href={~p"/profiles"} class="btn-medieval">{gettext("Enter your Ledgers")}</.link>
+      <% else %>
+        <.link href={~p"/users/register"} class="btn-medieval">
+          {gettext("Create your Adventurer")}
+        </.link>
+        <.link href={~p"/users/log-in"} class="btn-medieval">{gettext("Enter the Vault")}</.link>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-3">
+    <div class="panel p-5">
+      <h2 class="panel-title text-lg">{gettext("Track every coin")}</h2>
+      <p class="text-muted mt-1">
+        {gettext("Recurring wages and sporadic bounties alike, month by month.")}
+      </p>
+    </div>
+    <div class="panel p-5">
+      <h2 class="panel-title text-lg">{gettext("Map your year")}</h2>
+      <p class="text-muted mt-1">
+        {gettext("Twelve months at a glance — surplus in gold, deficit in crimson.")}
+      </p>
+    </div>
+    <div class="panel p-5">
+      <h2 class="panel-title text-lg">{gettext("Many ledgers")}</h2>
+      <p class="text-muted mt-1">{gettext("Keep separate profiles for each purse you carry.")}</p>
+    </div>
+  </div>
+</Layouts.app>

@@ -1,0 +1,178 @@
+/* See the Tailwind configuration guide for advanced usage
+   https://tailwindcss.com/docs/configuration */
+
+@import "tailwindcss" source(none);
+@source "../css";
+@source "../js";
+@source "../../lib/idcal_web";
+
+/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+   The heroicons installation itself is managed by your mix.exs */
+@plugin "../vendor/heroicons";
+
+/* daisyUI Tailwind Plugin. */
+@plugin "../vendor/daisyui" {
+  themes: false;
+}
+
+/* IDCAL — medieval RPG theme (RuneScape 2007-era inspired) */
+@plugin "../vendor/daisyui-theme" {
+  name: "medieval";
+  default: true;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: #2e1f0e;
+  --color-base-200: #241809;
+  --color-base-300: #1a1208;
+  --color-base-content: #f0dfa0;
+  --color-primary: #6b3d0f;
+  --color-primary-content: #f0dfa0;
+  --color-secondary: #7a5c1e;
+  --color-secondary-content: #1a1208;
+  --color-accent: #d4a017;
+  --color-accent-content: #1a1208;
+  --color-neutral: #2e1f0e;
+  --color-neutral-content: #f0dfa0;
+  --color-info: #7a5c1e;
+  --color-info-content: #f0dfa0;
+  --color-success: #3d8b3d;
+  --color-success-content: #f0dfa0;
+  --color-warning: #d4a017;
+  --color-warning-content: #1a1208;
+  --color-error: #8b1a1a;
+  --color-error-content: #f0dfa0;
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* ── IDCAL medieval styling ───────────────────────────────────────── */
+
+:root {
+  --idcal-gold: #d4a017;
+  --idcal-border: #7a5c1e;
+  --idcal-cream: #f0dfa0;
+  --idcal-muted: #a08050;
+  --idcal-income: #3d8b3d;
+  --idcal-expense: #8b1a1a;
+}
+
+body {
+  font-family: "IM Fell English", Georgia, serif;
+  background-color: #1a1208;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(122, 92, 30, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(122, 92, 30, 0.06) 0%, transparent 50%);
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.02em;
+}
+
+.font-cinzel { font-family: "Cinzel", serif; }
+.font-body { font-family: "IM Fell English", Georgia, serif; }
+
+/* Amounts use monospace for column alignment */
+.amount {
+  font-family: "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-income { color: var(--idcal-income); }
+.text-expense { color: var(--idcal-expense); }
+.text-gold { color: var(--idcal-gold); }
+.text-muted { color: var(--idcal-muted); }
+
+/* Chunky inventory-slot panels */
+.panel {
+  background-color: #2e1f0e;
+  border: 3px solid var(--idcal-border);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.panel-title {
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  color: var(--idcal-gold);
+}
+
+/* Medieval buttons */
+.btn-medieval {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "Cinzel", serif;
+  background-color: #6b3d0f;
+  color: var(--idcal-cream);
+  border: 2px solid var(--idcal-border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.12s, border-color 0.12s;
+  cursor: pointer;
+}
+.btn-medieval:hover {
+  background-color: #8b5213;
+  border-color: var(--idcal-gold);
+}
+.btn-medieval:active {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+.btn-medieval:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-danger {
+  background-color: #5a1212;
+  border-color: #8b1a1a;
+}
+.btn-danger:hover {
+  background-color: #8b1a1a;
+  border-color: var(--idcal-gold);
+}
+
+/* Inputs */
+.input-medieval {
+  background-color: #1a1208;
+  color: var(--idcal-cream);
+  border: 2px solid var(--idcal-border);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+}
+.input-medieval:focus {
+  outline: none;
+  border-color: var(--idcal-gold);
+}
+
+/* Tables */
+.table-medieval { width: 100%; border-collapse: collapse; }
+.table-medieval th {
+  font-family: "Cinzel", serif;
+  color: var(--idcal-gold);
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--idcal-border);
+}
+.table-medieval td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(122, 92, 30, 0.35);
+}
+.table-medieval tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.25);
+}
