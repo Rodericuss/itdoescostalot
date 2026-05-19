@@ -27,12 +27,12 @@
 
 ## Phase 3 — Income Domain
 
-- [ ] Migrations + schemas: `IncomeCategory`, `IncomeSource`, `IncomeEntry`
-- [ ] Context functions: CRUD for all three
-- [ ] LiveView: `/profiles/:id/income`
+- [x] Migrations + schemas: `IncomeCategory`, `IncomeSource`, `IncomeEntry`
+- [x] Context functions: CRUD for all three
+- [x] LiveView: `/profiles/:id/income`
   - List categories with their sources
   - Inline forms for adding categories, sources, entries
-- [ ] Resolver function: `resolve_income_for_month(profile, year, month)`
+- [x] Resolver function: `resolve_income_for_month(profile, year, month)`
 
 **Deliverable:** User can fully manage income data.
 
@@ -40,11 +40,11 @@
 
 ## Phase 4 — Expense Domain
 
-- [ ] Migrations + schemas: `ExpenseCategory`, `ExpenseType`, `ExpenseEntry`
-- [ ] Context functions: CRUD for all three
-- [ ] LiveView: `/profiles/:id/expenses`
+- [x] Migrations + schemas: `ExpenseCategory`, `ExpenseType`, `ExpenseEntry`
+- [x] Context functions: CRUD for all three
+- [x] LiveView: `/profiles/:id/expenses`
   - Same UX pattern as income
-- [ ] Resolver function: `resolve_expenses_for_month(profile, year, month)`
+- [x] Resolver function: `resolve_expenses_for_month(profile, year, month)`
 
 **Deliverable:** User can fully manage expense data.
 
@@ -52,11 +52,11 @@
 
 ## Phase 5 — Monthly Detail View
 
-- [ ] LiveView: `/profiles/:id/month/:year/:month`
-- [ ] Income breakdown table (source → value)
-- [ ] Expense breakdown table (category → type → value)
-- [ ] Net balance display (color-coded)
-- [ ] Basic donut chart for expense categories (Chart.js via JS hook)
+- [x] LiveView: `/profiles/:id/month/:year/:month`
+- [x] Income breakdown table (source → value)
+- [x] Expense breakdown table (category → type → value)
+- [x] Net balance display (color-coded)
+- [x] Basic donut chart for expense categories (Chart.js via JS hook)
 
 **Deliverable:** User can inspect any month in detail.
 
@@ -64,12 +64,12 @@
 
 ## Phase 6 — Annual Dashboard
 
-- [ ] LiveView: `/profiles/:id` (main dashboard)
-- [ ] Year selector
-- [ ] 12 month cards with income / expense / balance
-- [ ] Bar chart: income vs expenses per month (Chart.js hook)
-- [ ] Line chart: cumulative balance across the year
-- [ ] Click on month card → navigate to monthly detail
+- [x] LiveView: `/profiles/:id` (main dashboard)
+- [x] Year selector
+- [x] 12 month cards with income / expense / balance
+- [x] Bar chart: income vs expenses per month (Chart.js hook)
+- [x] Line chart: cumulative balance across the year
+- [x] Click on month card → navigate to monthly detail
 
 **Deliverable:** Full visual financial map of the year.
 
@@ -77,11 +77,12 @@
 
 ## Phase 7 — Polish & UX
 
-- [ ] Form validation with clear error messages
-- [ ] Confirm dialogs for destructive actions (delete category, profile)
-- [ ] Empty state screens (no income yet, no expenses yet)
-- [ ] Responsive layout (mobile-friendly)
-- [ ] Loading states for chart rendering
+- [x] Form validation with clear error messages
+- [x] Confirm dialogs for destructive actions (delete category, profile)
+- [x] Empty state screens (no income yet, no expenses yet)
+- [x] Responsive layout (mobile-friendly)
+- [x] Loading states for chart rendering
+- [x] Input validation (year/month params, year range 1970–9999)
 
 ---
 

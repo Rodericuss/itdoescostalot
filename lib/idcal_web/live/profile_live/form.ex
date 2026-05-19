@@ -90,6 +90,45 @@ defmodule IdcalWeb.ProfileLive.Form do
               </p>
             </div>
 
+            <div>
+              <label class="font-cinzel text-sm text-gold">📅 {gettext("Tracking Start")}</label>
+              <p class="italic-fell text-muted text-xs mb-2">
+                {gettext("Months before this date will be excluded from calculations.")}
+              </p>
+              <div class="flex gap-3">
+                <div class="flex-1">
+                  <label class="text-muted text-xs">{gettext("Year")}</label>
+                  <input
+                    type="number"
+                    name={@form[:start_year].name}
+                    value={Phoenix.HTML.Form.normalize_value("number", @form[:start_year].value)}
+                    class="input-medieval w-full mt-1"
+                    placeholder="2026"
+                    min="1970"
+                    max="9999"
+                  />
+                </div>
+                <div class="flex-1">
+                  <label class="text-muted text-xs">{gettext("Month")}</label>
+                  <input
+                    type="number"
+                    name={@form[:start_month].name}
+                    value={Phoenix.HTML.Form.normalize_value("number", @form[:start_month].value)}
+                    class="input-medieval w-full mt-1"
+                    placeholder="1"
+                    min="1"
+                    max="12"
+                  />
+                </div>
+              </div>
+              <p
+                :for={msg <- Enum.map(@form[:start_year].errors ++ @form[:start_month].errors, &translate_error/1)}
+                class="text-expense text-sm mt-1"
+              >
+                {msg}
+              </p>
+            </div>
+
             <div class="flex gap-2">
               <button type="submit" class="btn-medieval">{gettext("Save")}</button>
               <.link navigate={~p"/profiles"} class="btn-medieval">{gettext("Cancel")}</.link>

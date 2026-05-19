@@ -7,6 +7,7 @@ defmodule Idcal.Finances do
   alias Idcal.Repo
   alias Idcal.Accounts.Scope
   alias Idcal.Finances.{Profile, IncomeCategory, IncomeSource, IncomeEntry}
+  alias Idcal.Finances.{ExpenseCategory, ExpenseType, ExpenseEntry}
 
   ## Profiles
 
@@ -168,6 +169,7 @@ defmodule Idcal.Finances do
       IncomeSource
       |> where(profile_id: ^profile.id)
       |> order_by(asc: :name)
+      |> preload(:income_category)
       |> Repo.all()
 
     entries = entries_by_source(IncomeEntry, sources, year, month)
@@ -185,6 +187,156 @@ defmodule Idcal.Finances do
     profile
     |> income_breakdown_for_month(year, month)
     |> Enum.reduce(Decimal.new(0), fn {_source, amount}, acc -> Decimal.add(acc, amount) end)
+  end
+
+  ## Expense categories
+
+  def list_expense_categories(%Profile{} = profile) do
+    ExpenseCategory
+    |> where(profile_id: ^profile.id)
+    |> order_by(asc: :name)
+    |> preload(
+      types: ^from(t in ExpenseType, order_by: t.name, preload: [entries: ^from(e in ExpenseEntry, order_by: [desc: e.year, desc: e.month])])
+    )
+    |> Repo.all()
+  end
+
+  def get_expense_category!(%Profile{} = profile, id) do
+    ExpenseCategory
+    |> where(profile_id: ^profile.id)
+    |> Repo.get!(id)
+  end
+
+  def create_expense_category(%Profile{} = profile, attrs) do
+    %ExpenseCategory{profile_id: profile.id}
+    |> ExpenseCategory.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_expense_category(%ExpenseCategory{} = category, attrs) do
+    category
+    |> ExpenseCategory.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_expense_category(%ExpenseCategory{} = category) do
+    Repo.delete(category)
+  end
+
+  def change_expense_category(%ExpenseCategory{} = category, attrs \\ %{}) do
+    ExpenseCategory.changeset(category, attrs)
+  end
+
+  ## Expense types
+
+  def get_expense_type!(%Profile{} = profile, id) do
+    ExpenseType
+    |> where(profile_id: ^profile.id)
+    |> Repo.get!(id)
+  end
+
+  def create_expense_type(%Profile{} = profile, attrs) do
+    %ExpenseType{profile_id: profile.id}
+    |> ExpenseType.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_expense_type(%ExpenseType{} = type, attrs) do
+    type
+    |> ExpenseType.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_expense_type(%ExpenseType{} = type) do
+    Repo.delete(type)
+  end
+
+  def change_expense_type(%ExpenseType{} = type, attrs \\ %{}) do
+    ExpenseType.changeset(type, attrs)
+  end
+
+  ## Expense entries
+
+  def list_expense_entries(%ExpenseType{} = type) do
+    ExpenseEntry
+    |> where(expense_type_id: ^type.id)
+    |> order_by(desc: :year, desc: :month)
+    |> Repo.all()
+  end
+
+  def get_expense_entry!(%ExpenseType{} = type, id) do
+    ExpenseEntry
+    |> where(expense_type_id: ^type.id)
+    |> Repo.get!(id)
+  end
+
+  def create_expense_entry(%ExpenseType{} = type, attrs) do
+    %ExpenseEntry{expense_type_id: type.id}
+    |> ExpenseEntry.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_expense_entry(%ExpenseEntry{} = entry, attrs) do
+    entry
+    |> ExpenseEntry.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_expense_entry(%ExpenseEntry{} = entry) do
+    Repo.delete(entry)
+  end
+
+  def change_expense_entry(%ExpenseEntry{} = entry, attrs \\ %{}) do
+    ExpenseEntry.changeset(entry, attrs)
+  end
+
+  ## Expense resolution
+
+  def expense_breakdown_for_month(%Profile{} = profile, year, month) do
+    types =
+      ExpenseType
+      |> where(profile_id: ^profile.id)
+      |> order_by(asc: :name)
+      |> preload(:expense_category)
+      |> Repo.all()
+
+    entries = entries_by_source(ExpenseEntry, types, year, month)
+
+    Enum.flat_map(types, fn type ->
+      case resolve_amount(type, Map.get(entries, type.id)) do
+        nil -> []
+        amount -> [{type, amount}]
+      end
+    end)
+  end
+
+  def expense_breakdown_grouped_by_category(%Profile{} = profile, year, month) do
+    profile
+    |> expense_breakdown_for_month(year, month)
+    |> Enum.group_by(fn {type, _amount} -> type.expense_category end)
+    |> Enum.map(fn {category, items} ->
+      total = Enum.reduce(items, Decimal.new(0), fn {_, amt}, acc -> Decimal.add(acc, amt) end)
+      {category, items, total}
+    end)
+    |> Enum.sort_by(fn {cat, _, _} -> cat.name end)
+  end
+
+  def resolve_expenses_for_month(%Profile{} = profile, year, month) do
+    profile
+    |> expense_breakdown_for_month(year, month)
+    |> Enum.reduce(Decimal.new(0), fn {_type, amount}, acc -> Decimal.add(acc, amount) end)
+  end
+
+  ## Annual summary
+
+  def annual_summary(%Profile{} = profile, year) do
+    Enum.map(1..12, fn month ->
+      tracked = Profile.tracking_started?(profile, year, month)
+      income = resolve_income_for_month(profile, year, month)
+      expenses = resolve_expenses_for_month(profile, year, month)
+      balance = Decimal.sub(income, expenses)
+      %{month: month, income: income, expenses: expenses, balance: balance, tracked: tracked}
+    end)
   end
 
   # Shared by income/expense resolution: map source_id => entry for the month.

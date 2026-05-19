@@ -38,8 +38,8 @@ defmodule IdcalWeb.Layouts do
     <header class="border-b-[3px] border-[#7a5c1e] bg-[#2e1f0e]">
       <div class="mx-auto max-w-6xl flex items-center justify-between px-4 py-3 sm:px-6">
         <a href="/" class="flex items-center gap-2">
-          <.coin_icon class="size-7 text-gold" />
-          <span class="font-cinzel font-bold text-xl text-gold">IDCAL</span>
+          <span class="text-xl">💰</span>
+          <span class="font-cinzel-decorative font-bold text-xl text-gold">IDCAL</span>
           <span class="hidden sm:inline text-muted text-sm italic">
             {gettext("It Does Cost A Lot")}
           </span>
@@ -48,27 +48,27 @@ defmodule IdcalWeb.Layouts do
           <%= if @current_scope do %>
             <li class="text-muted hidden sm:block">{@current_scope.user.email}</li>
             <li>
-              <.link href={~p"/profiles"} class="hover:text-gold">{gettext("Profiles")}</.link>
+              <.link href={~p"/profiles"} class="hover:text-gold">📜 {gettext("Profiles")}</.link>
             </li>
             <li>
               <.link href={~p"/users/settings"} class="hover:text-gold">
-                {gettext("Settings")}
+                ⚙️ {gettext("Settings")}
               </.link>
             </li>
             <li>
               <.link href={~p"/users/log-out"} method="delete" class="hover:text-gold">
-                {gettext("Log out")}
+                🚪 {gettext("Log out")}
               </.link>
             </li>
           <% else %>
             <li>
               <.link href={~p"/users/register"} class="hover:text-gold">
-                {gettext("Register")}
+                ⚔️ {gettext("Register")}
               </.link>
             </li>
             <li>
               <.link href={~p"/users/log-in"} class="hover:text-gold">
-                {gettext("Enter the Vault")}
+                🏰 {gettext("Enter the Vault")}
               </.link>
             </li>
           <% end %>

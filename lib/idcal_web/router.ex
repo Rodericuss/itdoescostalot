@@ -62,6 +62,8 @@ defmodule IdcalWeb.Router do
       live "/profiles/:id", ProfileLive.Show, :show
       live "/profiles/:id/settings", ProfileLive.Form, :edit
       live "/profiles/:id/income", IncomeLive.Index, :index
+      live "/profiles/:id/expenses", ExpenseLive.Index, :index
+      live "/profiles/:id/month/:year/:month", MonthLive.Show, :show
     end
 
     post "/users/update-password", UserSessionController, :update_password

@@ -1,93 +1,211 @@
-# IDCAL — It Does Cost A Lot
+<div align="center">
 
-> A multi-user personal finance tracker with a medieval RPG aesthetic.
+# ⚔️ IDCAL — It Does Cost A Lot
 
-IDCAL ("It Does Cost A Lot") helps you map the coin of your realm — your income
-and expenses across the months of a year — through a warm, cartoonish interface
-inspired by early-2000s RPGs. Track recurring wages and sporadic bounties, watch
-your balance rise and fall, and see your whole financial year at a glance.
+### _Track thy gold like a true adventurer_
 
-## The idea behind it
+A multi-user personal finance tracker with a **medieval RPG aesthetic**,<br>
+inspired by the golden age of RuneScape (2007-era).
 
-Most finance apps are cold spreadsheets. IDCAL reframes budgeting as charting a
-year of adventure: each profile is a **ledger**, income flows in like loot, and
-expenses drain the coffers. The medieval theme is purely cosmetic — under the
-hood it is an honest, dynamic ledger — but it makes the dull task of tracking
-money a little more inviting.
+![Elixir](https://img.shields.io/badge/Elixir-4B275F?style=for-the-badge&logo=elixir&logoColor=white)
+![Phoenix](https://img.shields.io/badge/Phoenix_LiveView-FD4F00?style=for-the-badge&logo=phoenix-framework&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
 
-The core of the app is a single equation, computed live and never stored:
+</div>
+
+---
+
+## 🏰 The Idea
+
+Most finance apps are cold spreadsheets. IDCAL reframes budgeting as **charting a year of adventure** — each profile is a _ledger_, income flows in like _loot_, and expenses drain the _coffers_.
+
+At its heart, one equation — computed live, never stored:
 
 ```
-Monthly Balance = Σ Income (month) − Σ Expenses (month)
+⚖️  Monthly Balance  =  Σ Income (month)  −  Σ Expenses (month)
 ```
 
-Both income and expenses can be **recurring monthly** (a base amount that may be
-overridden for any single month) or **one-time / sporadic** (counted only when an
-explicit entry exists). Balances are always derived from the data — the database
-is the single source of truth.
+Both income and expenses can be **recurring monthly** (a base amount with optional per-month overrides) or **sporadic** (counted only when an explicit entry exists). The database is the single source of truth.
 
-## Features
+---
 
-- **Authentication** — register, log in, log out (email + password).
-- **Profiles** — keep multiple independent ledgers per account (e.g. Personal,
-  Freelance). All financial data is scoped to a profile.
-- **Income & expenses** — user-defined categories, named sources/types, monthly
-  or sporadic recurrence, and per-month value overrides.
-- **Monthly summary** — income and expense breakdowns with a colour-coded net
-  balance.
-- **Annual dashboard** — twelve month cards plus charts of income vs. expenses
-  and cumulative balance across the year.
-- **Bilingual** — full English (en-US) and Brazilian Portuguese (pt-BR) support,
-  switchable at any time from the top bar.
-- **Real-time** — all updates happen in-page via Phoenix LiveView.
+## ✨ Features
 
-## Tech stack
+| | Feature | Description |
+|---|---|---|
+| 🔐 | **Authentication** | Register, log in, log out — email + password via `phx.gen.auth` |
+| 📜 | **Multiple Profiles** | Keep separate ledgers per account (Personal, Freelance, etc.) |
+| 💰 | **Income Tracking** | Categories → Sources → Entries, monthly or sporadic |
+| 🗡️ | **Expense Tracking** | Categories → Types → Entries, same flexible model |
+| 📊 | **Monthly Summary** | Income & expense breakdowns with colour-coded net balance |
+| 🗺️ | **Annual Dashboard** | 12-month cards, bar charts, cumulative balance line chart |
+| 🥧 | **Category Breakdown** | Donut charts to see where your gold goes |
+| ⚡ | **Real-time** | All updates in-page via Phoenix LiveView — no reloads |
+| 🌐 | **Bilingual** | English (en-US) & Brazilian Portuguese (pt-BR), switchable anytime |
 
-| Layer         | Choice                                             |
-|---------------|----------------------------------------------------|
-| Language      | Elixir                                             |
-| Web framework | Phoenix LiveView (fullstack, no separate frontend) |
-| Database      | PostgreSQL                                         |
-| Styling       | Tailwind CSS + daisyUI, custom medieval theme      |
-| Auth          | `phx.gen.auth`                                     |
-| Charts        | Chart.js via LiveView JS hooks                     |
-| i18n          | Gettext (en-US / pt-BR)                            |
-| Fonts         | Cinzel (headings), IM Fell English (body)          |
+---
 
-## Getting started
+## 🎨 Design System
 
-Prerequisites: Elixir, Erlang/OTP, and a running PostgreSQL server.
+<table>
+<tr>
+<td>
+
+**Color Palette**
+
+| Role | Swatch | Hex |
+|---|---|---|
+| Background | 🟫 Dark Parchment | `#1a1208` |
+| Panels | 🟫 Warm Brown | `#2e1f0e` |
+| Borders | 🟡 Aged Gold | `#7a5c1e` |
+| Text | 🟨 Cream | `#f0dfa0` |
+| Income | 🟢 Emerald | `#3d8b3d` |
+| Expenses | 🔴 Crimson | `#8b1a1a` |
+| Highlight | 🌟 Bright Gold | `#d4a017` |
+
+</td>
+<td>
+
+**Typography**
+
+| Use | Font |
+|---|---|
+| Headings | `Cinzel` 700 |
+| Labels | `Cinzel` 400 |
+| Body text | `IM Fell English` |
+| Amounts | `monospace` |
+
+**UI Vibe**
+- Chunky bordered panels
+- Dark parchment textures (CSS-only)
+- Gold hover states
+- No proprietary game assets
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧱 Architecture
+
+```
+User
+ └── Profile (ledger)
+      ├── IncomeCategory
+      │    └── IncomeSource (monthly / sporadic)
+      │         └── IncomeEntry (per-month override or one-time)
+      └── ExpenseCategory
+           └── ExpenseType (monthly / sporadic)
+                └── ExpenseEntry (per-month override or one-time)
+```
+
+> 💡 All financial data is scoped to a **Profile**, not directly to a User.
+> Balances are always **computed dynamically** — nothing is cached or stored.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Why |
+|---|---|---|
+| 🧪 Language | **Elixir** | Functional, fault-tolerant, beautiful |
+| 🌐 Framework | **Phoenix LiveView** | Fullstack, real-time, no JS frontend |
+| 🗄️ Database | **PostgreSQL** | Rock-solid relational store |
+| 🎨 Styling | **Tailwind CSS** | Utility-first + custom medieval theme |
+| 🔐 Auth | **phx.gen.auth** | Built-in Phoenix auth generator |
+| 📈 Charts | **Chart.js** | Rendered via LiveView JS hooks |
+| 🌍 i18n | **Gettext** | en-US / pt-BR with runtime switching |
+| ✒️ Fonts | **Google Fonts** | Cinzel + IM Fell English |
+
+---
+
+## 🚀 Getting Started
+
+**Prerequisites:** Elixir, Erlang/OTP, and a running PostgreSQL server.
 
 ```bash
-# 1. Install dependencies and set up the database
+# Clone the repository
+git clone https://github.com/your-username/itdoescostalot.git
+cd itdoescostalot
+
+# Install dependencies + set up database
 mix setup
 
-# 2. Start the development server
+# Start the development server
 mix phx.server
 ```
 
-Then visit [`localhost:4000`](http://localhost:4000), register an account, and
-forge your first ledger.
+Then visit **[`localhost:4000`](http://localhost:4000)**, register an account, and forge your first ledger. ⚒️
+
+### Other Commands
 
 ```bash
-mix test          # run the test suite
-mix ecto.migrate  # run pending migrations
+mix test           # ⚙️  Run the test suite
+mix ecto.migrate   # 📦  Run pending migrations
 ```
 
-## Project documentation
+---
 
-The repository carries its own design docs, which double as the development
-roadmap:
+## 🗺️ Page Map
 
-- `OVERVIEW.md` — high-level concept and goals
-- `DOMAIN.md` — data model and business rules
-- `FEATURES.md` — feature list with acceptance criteria
-- `DESIGN.md` — UI/UX guidelines, colour palette, page map
-- `ROADMAP.md` — phased implementation plan
-- `GLOSSARY.md` — canonical EN ↔ PT-BR term map for translations
+| Route | Page | Description |
+|---|---|---|
+| `/register` | 🏷️ Registration | _"Create your adventurer"_ |
+| `/log_in` | 🚪 Login | _"Enter the Vault"_ |
+| `/profiles` | 📜 Profile Selection | Grid of profile cards |
+| `/profiles/new` | ➕ Create Profile | Nickname form |
+| `/profiles/:id` | 🗺️ Annual Dashboard | 12-month overview + charts |
+| `/profiles/:id/income` | 💰 Income Management | Categories → Sources → Entries |
+| `/profiles/:id/expenses` | 🗡️ Expense Management | Categories → Types → Entries |
+| `/profiles/:id/month/:y/:m` | 📊 Monthly Detail | Breakdown tables + donut chart |
 
-## License
+---
 
-Released under the [MIT License](LICENSE) — free for open-source and commercial
-use. No proprietary game assets are used; the medieval look is achieved purely
-with CSS, inline SVG, and Google Fonts.
+## 📋 Roadmap
+
+| Phase | Status | Milestone |
+|---|---|---|
+| 1 — Foundation | ✅ Done | Phoenix app + auth + medieval shell |
+| 2 — Profiles | ✅ Done | Multi-profile CRUD |
+| 3 — Income | ✅ Done | Full income management |
+| 4 — Expenses | ✅ Done | Full expense management |
+| 5 — Monthly View | ✅ Done | Detailed month breakdown + charts |
+| 6 — Annual Dashboard | ✅ Done | 12-month overview + bar/line charts |
+| 7 — Polish & UX | ✅ Done | Validation, responsive, empty states |
+| 8 — i18n | 🔨 In Progress | en-US / pt-BR bilingual support |
+| 9 — Future | 📋 Planned | Budget goals, CSV export, themes |
+
+> 📖 Full details in [`ROADMAP.md`](ROADMAP.md)
+
+---
+
+## 📚 Documentation
+
+| File | Contents |
+|---|---|
+| [`OVERVIEW.md`](OVERVIEW.md) | High-level concept and goals |
+| [`DOMAIN.md`](DOMAIN.md) | Data model and business rules |
+| [`FEATURES.md`](FEATURES.md) | Feature list with acceptance criteria |
+| [`DESIGN.md`](DESIGN.md) | UI/UX guidelines, colour palette, page map |
+| [`ROADMAP.md`](ROADMAP.md) | Phased implementation plan |
+| [`GLOSSARY.md`](GLOSSARY.md) | Canonical EN ↔ PT-BR term map |
+
+---
+
+## 📄 License
+
+Released under the [MIT License](LICENSE) — free for open-source and commercial use.<br>
+No proprietary game assets are used; the medieval look is achieved purely with CSS, inline SVG, and Google Fonts.
+
+---
+
+<div align="center">
+
+_"A wise adventurer tracks every coin."_ 🪙
+
+**Built with ❤️ and Elixir**
+
+</div>
