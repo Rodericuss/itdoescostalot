@@ -433,6 +433,74 @@ defmodule Idcal.Finances do
     end
   end
 
+  ## Forecasting & Planning
+
+  @doc "Projects cash flow for the next `months_ahead` months using recurring base amounts."
+  def project_cash_flow(%Profile{} = profile, months_ahead, overrides \\ %{}) do
+    today = Date.utc_today()
+
+    income_sources =
+      IncomeSource
+      |> where(profile_id: ^profile.id, recurrence: :monthly)
+      |> where([s], not is_nil(s.base_amount))
+      |> Repo.all()
+
+    expense_types =
+      ExpenseType
+      |> where(profile_id: ^profile.id, recurrence: :monthly)
+      |> where([t], not is_nil(t.base_amount))
+      |> Repo.all()
+
+    Enum.map(1..months_ahead, fn offset ->
+      {year, month} = advance_months(today.year, today.month, offset)
+
+      projected_income =
+        income_sources
+        |> Enum.filter(fn s -> Map.get(overrides, {:income, s.id}, true) end)
+        |> Enum.reduce(Decimal.new(0), fn s, acc ->
+          amount = Map.get(overrides, {:income_amount, s.id}, s.base_amount)
+          Decimal.add(acc, amount)
+        end)
+
+      projected_expenses =
+        expense_types
+        |> Enum.filter(fn t -> Map.get(overrides, {:expense, t.id}, true) end)
+        |> Enum.reduce(Decimal.new(0), fn t, acc ->
+          amount = Map.get(overrides, {:expense_amount, t.id}, t.base_amount)
+          Decimal.add(acc, amount)
+        end)
+
+      balance = Decimal.sub(projected_income, projected_expenses)
+
+      %{year: year, month: month, income: projected_income, expenses: projected_expenses, balance: balance}
+    end)
+  end
+
+  @doc "Lists all recurring income sources for a profile (for what-if toggles)."
+  def list_recurring_income_sources(%Profile{} = profile) do
+    IncomeSource
+    |> where(profile_id: ^profile.id, recurrence: :monthly)
+    |> where([s], not is_nil(s.base_amount))
+    |> order_by(asc: :name)
+    |> preload(:income_category)
+    |> Repo.all()
+  end
+
+  @doc "Lists all recurring expense types for a profile (for what-if toggles)."
+  def list_recurring_expense_types(%Profile{} = profile) do
+    ExpenseType
+    |> where(profile_id: ^profile.id, recurrence: :monthly)
+    |> where([t], not is_nil(t.base_amount))
+    |> order_by(asc: :name)
+    |> preload(:expense_category)
+    |> Repo.all()
+  end
+
+  defp advance_months(year, month, offset) do
+    total = (year * 12 + month - 1) + offset
+    {div(total, 12), rem(total, 12) + 1}
+  end
+
   ## Budget overrides
 
   @doc "Resolves the effective budget limit for a category in a given month (override > global)."

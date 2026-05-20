@@ -121,8 +121,8 @@
 
 ## Phase 11 — Forecasting & Planning
 
-- [ ] Cash flow projection: project next 3–6–12 months using recurring data
-- [ ] "What if" scenarios: toggle sources/types on/off or adjust amounts to see projected impact without saving
+- [x] Cash flow projection: project next 3–6–12 months using recurring data
+- [x] "What if" scenarios: toggle sources/types on/off or adjust amounts to see projected impact without saving
 
 **Deliverable:** User can see the future financial trajectory and test hypothetical changes.
 

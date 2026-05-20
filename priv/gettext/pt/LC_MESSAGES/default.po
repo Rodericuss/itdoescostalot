@@ -199,6 +199,7 @@ msgstr "Valor"
 
 #: lib/idcal_web/live/expense_live/index.ex:349
 #: lib/idcal_web/live/expense_live/index.ex:380
+#: lib/idcal_web/live/forecast_live/show.ex:167
 #: lib/idcal_web/live/income_live/index.ex:331
 #: lib/idcal_web/live/income_live/index.ex:362
 #: lib/idcal_web/live/profile_live/form.ex:112
@@ -294,7 +295,7 @@ msgstr "Grátis. Sem anúncios. Seus dados são seus."
 msgid "Your Financial Quest"
 msgstr "Sua Jornada Financeira"
 
-#: lib/idcal_web/live/profile_live/show.ex:176
+#: lib/idcal_web/live/profile_live/show.ex:179
 #, elixir-autogen, elixir-format
 msgid "Not tracked"
 msgstr "Não rastreado"
@@ -319,8 +320,10 @@ msgstr "Adicionar Nascente"
 msgid "Add wellsprings & levies"
 msgstr "Adicione nascentes e taxas"
 
+#: lib/idcal_web/live/forecast_live/show.ex:94
+#: lib/idcal_web/live/forecast_live/show.ex:171
 #: lib/idcal_web/live/profile_live/show.ex:85
-#: lib/idcal_web/live/profile_live/show.ex:194
+#: lib/idcal_web/live/profile_live/show.ex:197
 #, elixir-autogen, elixir-format
 msgid "Amassed Hoard"
 msgstr "Tesouro Acumulado"
@@ -347,6 +350,8 @@ msgstr "Mapeie o reino"
 msgid "Chronicle Begins"
 msgstr "Início da Crônica"
 
+#: lib/idcal_web/live/forecast_live/show.ex:90
+#: lib/idcal_web/live/forecast_live/show.ex:168
 #: lib/idcal_web/live/income_live/index.ex:14
 #: lib/idcal_web/live/income_live/index.ex:215
 #: lib/idcal_web/live/insights_live/show.ex:159
@@ -359,7 +364,7 @@ msgstr "Início da Crônica"
 msgid "Coffers"
 msgstr "Cofres"
 
-#: lib/idcal_web/live/profile_live/show.ex:184
+#: lib/idcal_web/live/profile_live/show.ex:187
 #, elixir-autogen, elixir-format
 msgid "Coffers vs Tributes"
 msgstr "Cofres vs Tributos"
@@ -455,6 +460,7 @@ msgstr "Taxa abolida."
 msgid "Moons before this date shall be excluded from the chronicles."
 msgstr "Luas antes desta data serão excluídas das crônicas."
 
+#: lib/idcal_web/live/forecast_live/show.ex:170
 #: lib/idcal_web/live/insights_live/show.ex:205
 #: lib/idcal_web/live/month_live/show.ex:109
 #, elixir-autogen, elixir-format
@@ -561,6 +567,8 @@ msgstr "Guildas de Tributos"
 
 #: lib/idcal_web/live/expense_live/index.ex:18
 #: lib/idcal_web/live/expense_live/index.ex:220
+#: lib/idcal_web/live/forecast_live/show.ex:91
+#: lib/idcal_web/live/forecast_live/show.ex:169
 #: lib/idcal_web/live/insights_live/show.ex:165
 #: lib/idcal_web/live/insights_live/show.ex:183
 #: lib/idcal_web/live/insights_live/show.ex:201
@@ -671,7 +679,7 @@ msgstr "Outubro"
 msgid "September"
 msgstr "Setembro"
 
-#: lib/idcal_web/live/profile_live/show.ex:173
+#: lib/idcal_web/live/profile_live/show.ex:176
 #, elixir-autogen, elixir-format
 msgid "%{count} guild over limit"
 msgid_plural "%{count} guilds over limit"
@@ -866,3 +874,62 @@ msgstr "vs Mês Anterior"
 #, elixir-autogen, elixir-format
 msgid "vs Same Month Last Year"
 msgstr "vs Mesmo Mês do Ano Passado"
+
+#: lib/idcal_web/live/forecast_live/show.ex:143
+#, elixir-autogen, elixir-format
+msgid "%{count} month"
+msgid_plural "%{count} months"
+msgstr[0] "%{count} mês"
+msgstr[1] "%{count} meses"
+
+#: lib/idcal_web/live/forecast_live/show.ex:16
+#: lib/idcal_web/live/forecast_live/show.ex:134
+#: lib/idcal_web/live/profile_live/show.ex:143
+#, elixir-autogen, elixir-format
+msgid "Forecast"
+msgstr "Previsão"
+
+#: lib/idcal_web/live/forecast_live/show.ex:236
+#, elixir-autogen, elixir-format
+msgid "Levies"
+msgstr "Taxas"
+
+#: lib/idcal_web/live/forecast_live/show.ex:162
+#, elixir-autogen, elixir-format
+msgid "Monthly Breakdown"
+msgstr "Detalhamento Mensal"
+
+#: lib/idcal_web/live/forecast_live/show.ex:239
+#, elixir-autogen, elixir-format
+msgid "No recurring levies."
+msgstr "Nenhuma taxa recorrente."
+
+#: lib/idcal_web/live/forecast_live/show.ex:201
+#, elixir-autogen, elixir-format
+msgid "No recurring wellsprings."
+msgstr "Nenhuma nascente recorrente."
+
+#: lib/idcal_web/live/forecast_live/show.ex:150
+#, elixir-autogen, elixir-format
+msgid "Projected Cash Flow"
+msgstr "Fluxo de Caixa Projetado"
+
+#: lib/idcal_web/live/forecast_live/show.ex:197
+#, elixir-autogen, elixir-format
+msgid "Reset"
+msgstr "Reiniciar"
+
+#: lib/idcal_web/live/forecast_live/show.ex:237
+#, elixir-autogen, elixir-format
+msgid "Toggle levies on/off to see projected impact."
+msgstr "Ative/desative taxas para ver o impacto projetado."
+
+#: lib/idcal_web/live/forecast_live/show.ex:199
+#, elixir-autogen, elixir-format
+msgid "Toggle sources on/off to see projected impact."
+msgstr "Ative/desative nascentes para ver o impacto projetado."
+
+#: lib/idcal_web/live/forecast_live/show.ex:196
+#, elixir-autogen, elixir-format
+msgid "Wellsprings"
+msgstr "Nascentes"

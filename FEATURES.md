@@ -155,6 +155,18 @@
 
 ---
 
+## F17 — Forecasting & Planning
+
+- Cash flow projection for the next 3, 6, or 12 months using recurring (monthly) income sources and expense types
+- Mixed bar + line chart showing projected income, expenses, and cumulative balance
+- Monthly breakdown table with income, expenses, net purse, and amassed hoard
+- "What if" scenarios: toggle any recurring source or type on/off without saving
+- Adjust projected amounts inline to model hypothetical changes
+- Reset button to return to baseline projections
+- Accessible via `/profiles/:id/forecast`
+
+---
+
 ## Out of Scope (for now)
 
 - Currency conversion
