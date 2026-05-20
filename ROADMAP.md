@@ -101,8 +101,8 @@
 
 ## Phase 9 — Budgeting & Goals
 
-- [ ] Budget targets per expense category (monthly gold limit + progress bar)
-- [ ] Savings goals: named goal with target amount and deadline, tracked month over month
+- [x] Budget targets per expense category (monthly gold limit + progress bar)
+- [x] Savings goals: named goal with target amount and deadline, tracked month over month
 
 **Deliverable:** User can set spending limits per guild and save toward goals.
 
@@ -110,10 +110,10 @@
 
 ## Phase 10 — Insights & Analytics
 
-- [ ] Trend analysis: compare month vs previous month, or vs same month last year (% change)
-- [ ] Expense averages: rolling average per category over last 6 months
-- [ ] Income vs Expense ratio over time (single metric tracked monthly)
-- [ ] Category drilldown: click donut chart category to see individual types and entries
+- [x] Trend analysis: compare month vs previous month, or vs same month last year (% change)
+- [x] Expense averages: rolling average per category over last 6 months
+- [x] Income vs Expense ratio over time (single metric tracked monthly)
+- [x] Category drilldown: click donut chart category to see individual types and entries
 
 **Deliverable:** User gains actionable insight into spending patterns.
 

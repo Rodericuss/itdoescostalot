@@ -63,6 +63,8 @@ defmodule IdcalWeb.Router do
       live "/profiles/:id/settings", ProfileLive.Form, :edit
       live "/profiles/:id/income", IncomeLive.Index, :index
       live "/profiles/:id/expenses", ExpenseLive.Index, :index
+      live "/profiles/:id/goals", SavingsGoalLive.Index, :index
+      live "/profiles/:id/insights", InsightsLive.Show, :show
       live "/profiles/:id/month/:year/:month", MonthLive.Show, :show
     end
 

@@ -39,6 +39,12 @@ UI strings, flavor text) must stay consistent with this table.
 | Total | Total | Total |
 | Tracking start | Chronicle Begins | Início da Crônica |
 | Nickname (profile) | Title | Título |
+| Budget limit | Gold Limit | Limite de Ouro |
+| Budget override | Budget Override | Substituição de Orçamento |
+| Savings goal | Quest | Missão |
+| Contribution | Contribution | Contribuição |
+| Target amount | Target Amount | Valor Alvo |
+| Deadline | Deadline | Prazo |
 
 ---
 
@@ -95,6 +101,12 @@ Flavor text keeps the RuneScape-era medieval mood. Portuguese versions preserve 
 | Inscribe monthly records | Inscreva registros mensais |
 | Behold your treasury map | Contemple o mapa do tesouro |
 | No ledgers yet — forge your first to begin tracking your coin. | Nenhum livro-razão ainda — forje o primeiro para começar a acompanhar suas moedas. |
+| Quest abandoned. | Missão abandonada. |
+| Quest complete! Thy goal hath been achieved! | Missão concluída! Teu objetivo foi alcançado! |
+| No quests yet — embark on one to start saving toward your goal. | Nenhuma missão ainda — embarque em uma para começar a poupar rumo ao seu objetivo. |
+| To reach thy goal, thou must save X per month. | Para alcançar teu objetivo, deves poupar X por mês. |
+| The deadline hath passed and the quest remains unfinished. | O prazo já passou e a missão permanece inacabada. |
+| Abandon this quest? | Abandonar esta missão? |
 
 ---
 

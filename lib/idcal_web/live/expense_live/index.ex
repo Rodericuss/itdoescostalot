@@ -4,16 +4,21 @@ defmodule IdcalWeb.ExpenseLive.Index do
   alias Idcal.Finances
   alias Idcal.Finances.{ExpenseCategory, ExpenseType, ExpenseEntry}
 
+  import IdcalWeb.FormatHelpers, only: [format_amount: 1]
+
   @impl true
   def mount(%{"id" => profile_id}, _session, socket) do
     profile = Finances.get_profile!(socket.assigns.current_scope, profile_id)
     categories = Finances.list_expense_categories(profile)
+    today = Date.utc_today()
+    budget_status = Finances.budget_status_for_month(profile, today.year, today.month)
 
     {:ok,
      socket
      |> assign(:page_title, gettext("Tributes"))
      |> assign(:profile, profile)
      |> assign(:categories, categories)
+     |> assign(:budget_status, Map.new(budget_status, fn {cat, status} -> {cat.id, status} end))
      |> assign(:category_form, nil)
      |> assign(:editing_category, nil)
      |> assign(:type_form, nil)
@@ -224,10 +229,15 @@ defmodule IdcalWeb.ExpenseLive.Index do
         <h2 class="panel-title text-lg mb-3">
           {if @editing_category, do: gettext("Edit Guild"), else: gettext("New Guild")}
         </h2>
-        <.form for={@category_form} phx-submit="save_category" class="flex items-end gap-3">
-          <.input field={@category_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Provisions, Revelry")} />
-          <button type="submit" class="btn-medieval">{gettext("Save")}</button>
-          <button type="button" phx-click="cancel_category" class="btn-medieval btn-danger">{gettext("Cancel")}</button>
+        <.form for={@category_form} phx-submit="save_category" class="space-y-3">
+          <div class="flex flex-wrap items-end gap-3">
+            <.input field={@category_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Provisions, Revelry")} />
+            <.input field={@category_form[:budget_limit]} type="number" label={gettext("Gold Limit")} placeholder={gettext("optional")} step="0.01" min="0" />
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn-medieval">{gettext("Save")}</button>
+            <button type="button" phx-click="cancel_category" class="btn-medieval btn-danger">{gettext("Cancel")}</button>
+          </div>
         </.form>
       </div>
 
@@ -242,7 +252,12 @@ defmodule IdcalWeb.ExpenseLive.Index do
       <%!-- Category list --%>
       <div :for={category <- @categories} class="panel p-5 space-y-4">
         <div class="flex items-center justify-between">
-          <h2 class="panel-title text-xl">⚜️ {category.name}</h2>
+          <div>
+            <h2 class="panel-title text-xl">⚜️ {category.name}</h2>
+            <span :if={category.budget_limit} class="text-xs text-muted">
+              {gettext("Gold Limit:")} {format_amount(category.budget_limit)}
+            </span>
+          </div>
           <div class="flex gap-2">
             <button phx-click="new_type" phx-value-category-id={category.id} class="btn-medieval text-sm">
               ⛏️ {gettext("Add Levy")}
@@ -260,6 +275,9 @@ defmodule IdcalWeb.ExpenseLive.Index do
             </button>
           </div>
         </div>
+
+        <%!-- Budget progress bar --%>
+        <.budget_bar :if={@budget_status[category.id]} status={@budget_status[category.id]} />
 
         <%!-- Type form for this category --%>
         <div :if={@type_form && to_string(@type_category_id) == to_string(category.id)} class="ml-4 border-l-2 border-[#7a5c1e] pl-4">
@@ -388,6 +406,32 @@ defmodule IdcalWeb.ExpenseLive.Index do
           </tr>
         </tbody>
       </table>
+    </div>
+    """
+  end
+
+  defp budget_bar(assigns) do
+    pct_float = min(Decimal.to_float(assigns.status.percentage), 100)
+    color =
+      cond do
+        Decimal.gte?(assigns.status.percentage, 100) -> "bg-[#8b1a1a]"
+        Decimal.gte?(assigns.status.percentage, 80) -> "bg-[#d4a017]"
+        true -> "bg-[#3d8b3d]"
+      end
+
+    assigns = assign(assigns, pct_float: pct_float, color: color)
+
+    ~H"""
+    <div class="mt-1">
+      <div class="flex justify-between text-xs mb-1">
+        <span class="text-muted">{gettext("Spent:")} {format_amount(@status.spent)} / {format_amount(@status.limit)}</span>
+        <span class={if Decimal.gte?(@status.percentage, 100), do: "text-[#8b1a1a] font-bold", else: "text-gold"}>
+          {Decimal.to_string(@status.percentage)}%
+        </span>
+      </div>
+      <div class="w-full bg-[#1a1208] border border-[#7a5c1e] h-3">
+        <div class={["h-full transition-all", @color]} style={"width: #{@pct_float}%"} />
+      </div>
     </div>
     """
   end

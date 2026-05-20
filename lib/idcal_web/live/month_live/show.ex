@@ -45,7 +45,9 @@ defmodule IdcalWeb.MonthLive.Show do
      |> assign(:total_income, total_income)
      |> assign(:total_expenses, total_expenses)
      |> assign(:balance, balance)
-     |> assign(:chart_data, expense_chart_data(expense_groups))}
+     |> assign(:chart_data, expense_chart_data(expense_groups))
+     |> assign(:budget_status, Finances.budget_status_for_month(profile, year, month))
+     |> assign(:expanded_category, nil)}
   end
 
   defp expense_chart_data(expense_groups) do
@@ -70,6 +72,13 @@ defmodule IdcalWeb.MonthLive.Show do
         }
       ]
     })
+  end
+
+  @impl true
+  def handle_event("toggle_category", %{"id" => id}, socket) do
+    current = socket.assigns.expanded_category
+    new_id = String.to_integer(id)
+    {:noreply, assign(socket, :expanded_category, if(current == new_id, do: nil, else: new_id))}
   end
 
   @impl true
@@ -148,16 +157,41 @@ defmodule IdcalWeb.MonthLive.Show do
             🕸️ {gettext("No tributes paid this moon.")}
           </div>
           <div :for={{category, items, cat_total} <- @expense_groups} class="mb-4">
-            <div class="flex justify-between items-center border-b border-[#7a5c1e] pb-1 mb-1">
-              <span class="font-cinzel text-gold text-sm">{category.name}</span>
+            <div
+              class="flex justify-between items-center border-b border-[#7a5c1e] pb-1 mb-1 cursor-pointer hover:bg-[#2e1f0e]/50"
+              phx-click="toggle_category"
+              phx-value-id={category.id}
+            >
+              <span class="font-cinzel text-gold text-sm">
+                {if @expanded_category == category.id, do: "▾", else: "▸"} {category.name}
+              </span>
               <span class="text-[#8b1a1a] font-mono text-sm">{format_amount(cat_total)}</span>
             </div>
+            <.budget_bar_mini :for={{cat, status} <- @budget_status} :if={cat.id == category.id} status={status} />
             <table class="w-full text-sm">
               <tr :for={{type, amount} <- items} class="border-b border-[#7a5c1e]/20">
                 <td class="py-0.5 px-2 text-cream">{type.name}</td>
                 <td class="py-0.5 px-2 text-right text-[#8b1a1a] font-mono">{format_amount(amount)}</td>
               </tr>
             </table>
+            <%!-- Drilldown: show individual entries when expanded --%>
+            <div :if={@expanded_category == category.id} class="ml-4 mt-2 border-l-2 border-[#7a5c1e] pl-3">
+              <div :for={{type, _amount} <- items} class="mb-3">
+                <p class="font-cinzel text-cream text-xs mb-1">{type.name}</p>
+                <div :if={Ecto.assoc_loaded?(type.entries)} class="space-y-0.5">
+                  <div
+                    :for={entry <- Enum.filter(type.entries, &(&1.year == @year && &1.month == @month))}
+                    class="flex justify-between text-xs"
+                  >
+                    <span class="text-muted">{entry.note || gettext("Entry")}</span>
+                    <span class="text-[#8b1a1a] font-mono">{format_amount(entry.amount)}</span>
+                  </div>
+                </div>
+                <p :if={type.recurrence == :monthly && !has_entry_for_month?(type, @year, @month)} class="text-xs text-muted italic-fell">
+                  {gettext("Base Tithe")}: {format_amount(type.base_amount)}
+                </p>
+              </div>
+            </div>
           </div>
           <div :if={@expense_groups != []} class="border-t-2 border-[#7a5c1e] pt-2 flex justify-between">
             <span class="font-cinzel text-gold">{gettext("Total")}</span>
@@ -193,6 +227,37 @@ defmodule IdcalWeb.MonthLive.Show do
       },
       cutout: "50%"
     })
+  end
+
+  defp has_entry_for_month?(type, year, month) do
+    Ecto.assoc_loaded?(type.entries) &&
+      Enum.any?(type.entries, &(&1.year == year && &1.month == month))
+  end
+
+  defp budget_bar_mini(assigns) do
+    pct_float = min(Decimal.to_float(assigns.status.percentage), 100)
+    color =
+      cond do
+        Decimal.gte?(assigns.status.percentage, 100) -> "bg-[#8b1a1a]"
+        Decimal.gte?(assigns.status.percentage, 80) -> "bg-[#d4a017]"
+        true -> "bg-[#3d8b3d]"
+      end
+
+    assigns = assign(assigns, pct_float: pct_float, color: color)
+
+    ~H"""
+    <div class="my-1">
+      <div class="flex justify-between text-xs">
+        <span class="text-muted">{format_amount(@status.spent)} / {format_amount(@status.limit)}</span>
+        <span class={if Decimal.gte?(@status.percentage, 100), do: "text-[#8b1a1a]", else: "text-muted"}>
+          {Decimal.to_string(@status.percentage)}%
+        </span>
+      </div>
+      <div class="w-full bg-[#1a1208] border border-[#7a5c1e] h-2">
+        <div class={["h-full transition-all", @color]} style={"width: #{@pct_float}%"} />
+      </div>
+    </div>
+    """
   end
 
   defp prev_month_path(profile, year, 1), do: ~p"/profiles/#{profile}/month/#{year - 1}/12"

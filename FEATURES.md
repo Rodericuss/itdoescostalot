@@ -123,9 +123,40 @@
 
 ---
 
+## F14 — Budget Targets
+
+- User can set a global budget limit (Gold Limit) on each expense category
+- Budget limits can be overridden per month (same pattern as base_amount + entries)
+- Budget progress bars appear on the expense management page, monthly detail view, and dashboard month cards
+- Progress bar turns red when spending exceeds the limit, gold when approaching (80%+)
+- Dashboard month cards show a warning when any guild exceeds its limit
+
+---
+
+## F15 — Savings Goals (Quests)
+
+- User can create named savings goals with a target amount and deadline
+- Each goal has a tracking mode: manual contributions or auto (from monthly surplus)
+- Manual mode: user logs explicit contributions per month
+- Auto mode: progress is computed from cumulative positive net balance
+- Progress bar shows percentage saved toward target
+- Dashboard displays required monthly savings to reach the goal by deadline
+- Status messages for: on track, quest complete, deadline passed
+
+---
+
+## F16 — Insights & Analytics
+
+- Trend analysis: compare current month vs previous month and vs same month last year (% change for income and expenses)
+- Rolling 6-month expense averages by category (guild)
+- Income/expense ratio chart across the year (line chart, 1.0 = break even)
+- Category drilldown: click an expense category in the monthly view to expand and see individual types and entries
+- All analytics accessible via `/profiles/:id/insights` with month navigation
+
+---
+
 ## Out of Scope (for now)
 
-- Budget goals / savings targets
 - Currency conversion
 - Import from bank statements
 - Recurring reminders or notifications

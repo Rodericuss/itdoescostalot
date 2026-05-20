@@ -127,6 +127,55 @@ Same dual purpose as IncomeEntry: sporadic occurrences or monthly overrides.
 
 ---
 
+### BudgetOverride
+A per-month override for an expense category's budget limit.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| expense_category_id | bigint | FK → ExpenseCategory |
+| year | integer | |
+| month | integer | 1–12 |
+| limit | decimal | budget limit for this month |
+
+> **Rule — Budget Resolution:** For a given month, if a `BudgetOverride` exists → use its `limit`. Otherwise → use `ExpenseCategory.budget_limit`. If neither is set, no budget tracking for that category.
+
+---
+
+### SavingsGoal
+A named savings target with a deadline, scoped to a profile.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| profile_id | bigint | FK → Profile |
+| name | string | e.g. "Travel to Africa" |
+| target_amount | decimal | how much to save |
+| deadline | date | target date |
+| tracking_mode | enum | `:auto` or `:manual` |
+
+> **Rule — Tracking Modes:**
+> - `:manual` — progress is the sum of explicit `SavingsContribution` entries.
+> - `:auto` — progress is computed from cumulative monthly surplus (positive net balance months only) for the current year.
+
+---
+
+### SavingsContribution
+A manual contribution toward a savings goal for a specific month.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| savings_goal_id | bigint | FK → SavingsGoal |
+| year | integer | |
+| month | integer | 1–12 |
+| amount | decimal | contributed amount |
+| note | string | optional |
+
+> Unique per goal + year + month.
+
+---
+
 ## Core Calculation: Monthly Balance
 
 ```elixir

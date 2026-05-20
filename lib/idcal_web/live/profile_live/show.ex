@@ -34,6 +34,16 @@ defmodule IdcalWeb.ProfileLive.Show do
 
   defp load_annual_data(socket, profile, year) do
     months = Finances.annual_summary(profile, year)
+
+    budget_by_month =
+      Enum.into(1..12, %{}, fn m ->
+        statuses = Finances.budget_status_for_month(profile, year, m)
+        over = Enum.count(statuses, fn {_, s} -> Decimal.gte?(s.percentage, 100) end)
+        total = length(statuses)
+        {m, %{over: over, total: total}}
+      end)
+
+    months = Enum.map(months, fn m -> Map.put(m, :budget, Map.get(budget_by_month, m.month)) end)
     tracked_months = Enum.filter(months, & &1.tracked)
 
     cumulative =
@@ -123,6 +133,12 @@ defmodule IdcalWeb.ProfileLive.Show do
           <.link navigate={~p"/profiles/#{@profile}/expenses"} class="btn-medieval text-sm">
             💸 {gettext("Tributes")}
           </.link>
+          <.link navigate={~p"/profiles/#{@profile}/goals"} class="btn-medieval text-sm">
+            🏆 {gettext("Quests")}
+          </.link>
+          <.link navigate={~p"/profiles/#{@profile}/insights"} class="btn-medieval text-sm">
+            🔍 {gettext("Insights")}
+          </.link>
           <.link navigate={~p"/profiles/#{@profile}/settings"} class="btn-medieval text-sm">
             <.icon name="hero-cog-6-tooth" class="size-4" />
           </.link>
@@ -153,6 +169,9 @@ defmodule IdcalWeb.ProfileLive.Show do
               <p class="text-[#8b1a1a]">{short_amount(m.expenses)}</p>
               <p class={balance_color(m.balance)}>{short_amount(m.balance)}</p>
             </div>
+            <p :if={m.budget.total > 0 && m.budget.over > 0} class="mt-1 text-xs text-[#8b1a1a]">
+              ⚠️ {ngettext("%{count} guild over limit", "%{count} guilds over limit", m.budget.over)}
+            </p>
           <% else %>
             <p class="mt-2 text-xs italic-fell text-muted">🚫 {gettext("Not tracked")}</p>
           <% end %>
