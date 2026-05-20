@@ -73,7 +73,7 @@ defmodule IdcalWeb.ProfileLive.Form do
 
           <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-4">
             <div>
-              <label class="font-cinzel text-sm text-gold">{gettext("Nickname")}</label>
+              <label class="font-cinzel text-sm text-gold">{gettext("Title")}</label>
               <input
                 type="text"
                 name={@form[:nickname].name}
@@ -91,9 +91,9 @@ defmodule IdcalWeb.ProfileLive.Form do
             </div>
 
             <div>
-              <label class="font-cinzel text-sm text-gold">📅 {gettext("Tracking Start")}</label>
+              <label class="font-cinzel text-sm text-gold">📅 {gettext("Chronicle Begins")}</label>
               <p class="italic-fell text-muted text-xs mb-2">
-                {gettext("Months before this date will be excluded from calculations.")}
+                {gettext("Moons before this date shall be excluded from the chronicles.")}
               </p>
               <div class="flex gap-3">
                 <div class="flex-1">

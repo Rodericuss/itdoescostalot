@@ -15,20 +15,20 @@ UI strings, flavor text) must stay consistent with this table.
 |---|---|---|
 | User account | User | Usuário |
 | Profile (ledger) | Profile / Ledger | Perfil / Livro-razão |
-| Income | Income | Receita |
-| Expense | Expense | Despesa |
-| Income category | Income Category | Categoria de Receita |
-| Expense category | Expense Category | Categoria de Despesa |
-| Income source | Income Source | Fonte de Renda |
-| Expense type | Expense Type | Tipo de Despesa |
-| Entry (monthly value) | Entry | Lançamento |
-| Base amount | Base Amount | Valor Base |
+| Income (UI label) | Coffers | Cofres |
+| Expense (UI label) | Tributes | Tributos |
+| Income category | Guild (income) | Guilda (cofres) |
+| Expense category | Guild (expense) | Guilda (tributos) |
+| Income source | Wellspring | Nascente |
+| Expense type | Levy | Taxa |
+| Entry (monthly value) | Record | Registro |
+| Base amount | Base Tithe | Dízimo Base |
 | Amount | Amount | Valor |
 | Note | Note | Observação |
 | Month / Year | Month / Year | Mês / Ano |
 | Balance | Balance | Saldo |
-| Net balance | Net Balance | Saldo Líquido |
-| Cumulative balance | Cumulative Balance | Saldo Acumulado |
+| Net balance | Net Purse | Bolsa Líquida |
+| Cumulative balance | Amassed Hoard | Tesouro Acumulado |
 | Surplus (positive) | Surplus | Superávit |
 | Deficit (negative) | Deficit | Déficit |
 | Recurrence | Recurrence | Recorrência |
@@ -37,6 +37,8 @@ UI strings, flavor text) must stay consistent with this table.
 | Recurring | Recurring | Recorrente |
 | Override (a month's value) | Override | Substituição |
 | Total | Total | Total |
+| Tracking start | Chronicle Begins | Início da Crônica |
+| Nickname (profile) | Title | Título |
 
 ---
 
@@ -76,11 +78,42 @@ Flavor text keeps the RuneScape-era medieval mood. Portuguese versions preserve 
 | Rename Ledger | Renomear Livro-razão |
 | Open (a ledger) | Abrir |
 | All Ledgers | Todos os Livros-razão |
-| Coffers / Treasury | Cofres / Tesouro |
-| Bounty (sporadic income) | Recompensa |
-| Track every coin | Acompanhe cada moeda |
-| Map your year | Mapeie seu ano |
+| Coffers vs Tributes | Cofres vs Tributos |
+| Amassed Hoard | Tesouro Acumulado |
+| Net Purse | Bolsa Líquida |
+| Tally every coin | Contabilize cada moeda |
+| Chart the realm | Mapeie o reino |
+| The Adventurer's Path | O Caminho do Aventureiro |
+| Add Wellspring | Adicionar Nascente |
+| Add Levy | Adicionar Taxa |
+| Guild disbanded. | Guilda dissolvida. |
+| Wellspring dried up. | Nascente secou. |
+| Levy abolished. | Taxa abolida. |
+| Record expunged. | Registro expurgado. |
+| Chronicle Begins | Início da Crônica |
+| Forge a ledger | Forje um livro-razão |
+| Inscribe monthly records | Inscreva registros mensais |
+| Behold your treasury map | Contemple o mapa do tesouro |
 | No ledgers yet — forge your first to begin tracking your coin. | Nenhum livro-razão ainda — forje o primeiro para começar a acompanhar suas moedas. |
+
+---
+
+## Month Names
+
+| English | Portuguese | Abbreviation (EN) | Abbreviation (PT) |
+|---|---|---|---|
+| January | Janeiro | Jan | Jan |
+| February | Fevereiro | Feb | Fev |
+| March | Março | Mar | Mar |
+| April | Abril | Apr | Abr |
+| May | Maio | May | Mai |
+| June | Junho | Jun | Jun |
+| July | Julho | Jul | Jul |
+| August | Agosto | Aug | Ago |
+| September | Setembro | Sep | Set |
+| October | Outubro | Oct | Out |
+| November | Novembro | Nov | Nov |
+| December | Dezembro | Dec | Dez |
 
 ---
 

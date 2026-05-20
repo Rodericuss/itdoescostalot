@@ -88,20 +88,80 @@
 
 ## Phase 8 — Internationalization (i18n)
 
-- [ ] Configure Gettext locales: `en-US` (default) and `pt-BR`
-- [ ] Wrap all user-facing strings in `gettext/1` — no hardcoded text
-- [ ] Generate and fill `pt-BR` `.po` files using GLOSSARY.md as the term map
-- [ ] Language switcher (button or modal) in the top bar, on every page
-- [ ] Persist chosen locale in session/cookie; plug to set locale per request
-- [ ] Localize month names and currency/number formatting per locale
+- [x] Configure Gettext locales: `en-US` (default) and `pt-BR`
+- [x] Wrap all user-facing strings in `gettext/1` — no hardcoded text
+- [x] Generate and fill `pt-BR` `.po` files using GLOSSARY.md as the term map
+- [x] Language switcher (button or modal) in the top bar, on every page
+- [x] Persist chosen locale in session/cookie; plug to set locale per request
+- [x] Localize month names and currency/number formatting per locale
 
 **Deliverable:** User can switch between English and Portuguese at any time.
 
 ---
 
-## Phase 9 — (Future / Optional)
+## Phase 9 — Budgeting & Goals
 
-- [ ] Budget goals per category
+- [ ] Budget targets per expense category (monthly gold limit + progress bar)
+- [ ] Savings goals: named goal with target amount and deadline, tracked month over month
+
+**Deliverable:** User can set spending limits per guild and save toward goals.
+
+---
+
+## Phase 10 — Insights & Analytics
+
+- [ ] Trend analysis: compare month vs previous month, or vs same month last year (% change)
+- [ ] Expense averages: rolling average per category over last 6 months
+- [ ] Income vs Expense ratio over time (single metric tracked monthly)
+- [ ] Category drilldown: click donut chart category to see individual types and entries
+
+**Deliverable:** User gains actionable insight into spending patterns.
+
+---
+
+## Phase 11 — Forecasting & Planning
+
+- [ ] Cash flow projection: project next 3–6–12 months using recurring data
+- [ ] "What if" scenarios: toggle sources/types on/off or adjust amounts to see projected impact without saving
+
+**Deliverable:** User can see the future financial trajectory and test hypothetical changes.
+
+---
+
+## Phase 12 — Data Management
+
 - [ ] CSV export of monthly data
+- [ ] CSV import: parse bank statements to auto-populate sporadic entries
+- [ ] Duplicate/clone month: copy all sporadic entries from one month to another
+- [ ] Templates: save a month's entry pattern and apply it to future months
+
+**Deliverable:** User can move data in and out efficiently and reduce repetitive entry.
+
+---
+
+## Phase 13 — Notifications & Reminders
+
+- [ ] Monthly check-in reminder email ("Hark! The month hath ended. Review thy ledger.")
+- [ ] Budget alert: notify when approaching or exceeding a category budget
+
+**Deliverable:** App reaches out to the user to stay on top of finances.
+
+---
+
+## Phase 14 — Multi-user & Social
+
+- [ ] Shared profiles: two users can share a profile (couples managing joint finances)
+- [ ] Profile comparison: side-by-side view of two profiles (e.g. Personal vs Freelance)
+
+**Deliverable:** Profiles can be collaborative and comparable.
+
+---
+
+## Phase 15 — UX Enhancements
+
+- [ ] Quick entry mode: minimal form to log a sporadic expense fast (category → type → amount → done)
+- [ ] Pinned/favorite categories at the top
+- [ ] Notes search: search entries by note text
+- [ ] Recurring entry calendar view with highlighted gaps
 - [ ] Dark/light theme toggle (keep medieval palette, just adjust brightness)
 - [ ] Multiple currencies per profile

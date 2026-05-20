@@ -3,7 +3,7 @@ defmodule IdcalWeb.MonthLive.Show do
 
   alias Idcal.Finances
 
-  @month_names ~w(January February March April May June July August September October November December)
+  import IdcalWeb.FormatHelpers, only: [month_name: 1, format_amount: 1]
 
   @impl true
   def mount(%{"id" => profile_id, "year" => year_str, "month" => month_str}, _session, socket) do
@@ -47,8 +47,6 @@ defmodule IdcalWeb.MonthLive.Show do
      |> assign(:balance, balance)
      |> assign(:chart_data, expense_chart_data(expense_groups))}
   end
-
-  defp month_name(m), do: Enum.at(@month_names, m - 1)
 
   defp expense_chart_data(expense_groups) do
     labels = Enum.map(expense_groups, fn {cat, _, _} -> cat.name end)
@@ -99,7 +97,7 @@ defmodule IdcalWeb.MonthLive.Show do
 
       <%!-- Net Balance --%>
       <div class="panel p-5 text-center">
-        <p class="font-cinzel text-muted text-sm">⚖️ {gettext("Net Balance")}</p>
+        <p class="font-cinzel text-muted text-sm">⚖️ {gettext("Net Purse")}</p>
         <p class={[
           "font-mono text-3xl font-bold mt-1",
           if(Decimal.compare(@balance, 0) == :lt, do: "text-[#8b1a1a]", else: "text-[#3d8b3d]")
@@ -107,23 +105,23 @@ defmodule IdcalWeb.MonthLive.Show do
           {format_amount(@balance)}
         </p>
         <div class="flex justify-center gap-8 mt-3 text-sm">
-          <span class="text-[#3d8b3d]">{gettext("Income:")} {format_amount(@total_income)}</span>
-          <span class="text-[#8b1a1a]">{gettext("Expenses:")} {format_amount(@total_expenses)}</span>
+          <span class="text-[#3d8b3d]">{gettext("Coffers:")} {format_amount(@total_income)}</span>
+          <span class="text-[#8b1a1a]">{gettext("Tributes:")} {format_amount(@total_expenses)}</span>
         </div>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2">
         <%!-- Income breakdown --%>
         <div class="panel p-5">
-          <h2 class="panel-title text-lg text-[#3d8b3d] mb-3">🪙 {gettext("Income")}</h2>
+          <h2 class="panel-title text-lg text-[#3d8b3d] mb-3">🪙 {gettext("Coffers")}</h2>
           <div :if={@income_breakdown == []} class="italic-fell text-muted text-sm">
-            🕸️ {gettext("No income this month.")}
+            🕸️ {gettext("No coin entered the coffers this moon.")}
           </div>
           <table :if={@income_breakdown != []} class="w-full text-sm">
             <thead>
               <tr class="text-gold font-cinzel text-xs border-b border-[#7a5c1e]">
-                <th class="text-left py-1 px-2">{gettext("Source")}</th>
-                <th class="text-left py-1 px-2">{gettext("Category")}</th>
+                <th class="text-left py-1 px-2">{gettext("Wellspring")}</th>
+                <th class="text-left py-1 px-2">{gettext("Guild")}</th>
                 <th class="text-right py-1 px-2">{gettext("Amount")}</th>
               </tr>
             </thead>
@@ -145,9 +143,9 @@ defmodule IdcalWeb.MonthLive.Show do
 
         <%!-- Expense breakdown (grouped by category) --%>
         <div class="panel p-5">
-          <h2 class="panel-title text-lg text-[#8b1a1a] mb-3">💸 {gettext("Expenses")}</h2>
+          <h2 class="panel-title text-lg text-[#8b1a1a] mb-3">💸 {gettext("Tributes")}</h2>
           <div :if={@expense_groups == []} class="italic-fell text-muted text-sm">
-            🕸️ {gettext("No expenses this month.")}
+            🕸️ {gettext("No tributes paid this moon.")}
           </div>
           <div :for={{category, items, cat_total} <- @expense_groups} class="mb-4">
             <div class="flex justify-between items-center border-b border-[#7a5c1e] pb-1 mb-1">
@@ -170,7 +168,7 @@ defmodule IdcalWeb.MonthLive.Show do
 
       <%!-- Expense donut chart --%>
       <div :if={@expense_groups != []} class="panel p-5">
-        <h2 class="panel-title text-lg mb-3">🥧 {gettext("Expense Categories")}</h2>
+        <h2 class="panel-title text-lg mb-3">🥧 {gettext("Tribute Guilds")}</h2>
         <div class="max-w-sm mx-auto">
           <canvas
             id="expense-donut"
@@ -183,12 +181,6 @@ defmodule IdcalWeb.MonthLive.Show do
       </div>
     </Layouts.app>
     """
-  end
-
-  defp format_amount(decimal) do
-    decimal
-    |> Decimal.round(2)
-    |> Decimal.to_string(:normal)
   end
 
   defp chart_options do

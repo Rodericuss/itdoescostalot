@@ -35,7 +35,7 @@ defmodule IdcalWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="border-b-[3px] border-[#7a5c1e] bg-[#2e1f0e]">
+    <header class="bg-[#2e1f0e] border-b-3 border-b-[#4a3510]" style="box-shadow: inset 0 -3px 0 #9a7a30;">
       <div class="mx-auto max-w-6xl flex items-center justify-between px-4 py-3 sm:px-6">
         <a href="/" class="flex items-center gap-2">
           <span class="text-xl">💰</span>
@@ -48,7 +48,7 @@ defmodule IdcalWeb.Layouts do
           <%= if @current_scope do %>
             <li class="text-muted hidden sm:block">{@current_scope.user.email}</li>
             <li>
-              <.link href={~p"/profiles"} class="hover:text-gold">📜 {gettext("Profiles")}</.link>
+              <.link href={~p"/profiles"} class="hover:text-gold">📜 {gettext("Ledgers")}</.link>
             </li>
             <li>
               <.link href={~p"/users/settings"} class="hover:text-gold">

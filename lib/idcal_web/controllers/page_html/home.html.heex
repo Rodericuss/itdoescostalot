@@ -1,29 +1,25 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <%!-- Hero Section --%>
-  <div class="relative overflow-hidden rounded border-2 border-[#7a5c1e]/40">
-    <div class="absolute inset-0 bg-gradient-to-b from-[#1a1208] via-[#2e1f0e] to-[#0d0b07] opacity-90"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,160,23,0.06)_0%,transparent_70%)]"></div>
-    <div class="relative px-6 py-16 sm:py-24 text-center">
-      <div class="flex justify-center mb-4">
-        <span class="text-6xl">💰</span>
-      </div>
-      <h1 class="font-cinzel-decorative font-bold text-5xl sm:text-6xl text-gold drop-shadow-[0_2px_4px_rgba(212,160,23,0.3)]">
-        {gettext("It Does Cost A Lot")}
-      </h1>
-      <p class="italic-fell mt-4 text-lg sm:text-xl max-w-xl mx-auto text-[#c4a060]">
-        {gettext("Chart the coin of your realm — income, expense, and the balance between.")}
-      </p>
+  <div class="panel px-6 py-16 sm:py-24 text-center">
+    <div class="flex justify-center mb-4">
+      <span class="text-6xl">💰</span>
+    </div>
+    <h1 class="font-cinzel-decorative font-bold text-5xl sm:text-6xl text-gold">
+      {gettext("It Does Cost A Lot")}
+    </h1>
+    <p class="italic-fell mt-4 text-lg sm:text-xl max-w-xl mx-auto text-[#c4a060]">
+      {gettext("Chart the coin of your realm — income, expense, and the balance between.")}
+    </p>
 
-      <div class="mt-10 flex flex-wrap justify-center gap-4">
-        <%= if @current_scope do %>
-          <.link href={~p"/profiles"} class="btn-medieval !py-3 !px-6 text-lg">📜 {gettext("Enter your Ledgers")}</.link>
-        <% else %>
-          <.link href={~p"/users/register"} class="btn-medieval !py-3 !px-6 text-lg !bg-[#3d8b3d] !border-[#5aad5a] hover:!bg-[#4a9e4a]">
-            ⚔️ {gettext("Create your Adventurer")}
-          </.link>
-          <.link href={~p"/users/log-in"} class="btn-medieval !py-3 !px-6 text-lg">🏰 {gettext("Enter the Vault")}</.link>
-        <% end %>
-      </div>
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <%= if @current_scope do %>
+        <.link href={~p"/profiles"} class="btn-medieval !py-3 !px-6 text-lg">📜 {gettext("Enter your Ledgers")}</.link>
+      <% else %>
+        <.link href={~p"/users/register"} class="btn-medieval !py-3 !px-6 text-lg !bg-[#3d8b3d]">
+          ⚔️ {gettext("Create your Adventurer")}
+        </.link>
+        <.link href={~p"/users/log-in"} class="btn-medieval !py-3 !px-6 text-lg">🏰 {gettext("Enter the Vault")}</.link>
+      <% end %>
     </div>
   </div>
 
@@ -31,51 +27,51 @@
   <div class="mt-2">
     <h2 class="font-cinzel-decorative text-gold text-2xl text-center mb-6">⚜️ {gettext("Your Financial Quest")} ⚜️</h2>
     <div class="grid gap-4 sm:grid-cols-3">
-      <div class="panel p-6 text-center group hover:border-[#3d8b3d] transition-colors">
+      <div class="panel p-6 text-center">
         <div class="text-4xl mb-3">🪙</div>
-        <h3 class="font-medieval text-gold text-lg">{gettext("Track every coin")}</h3>
+        <h3 class="font-medieval text-gold text-lg">{gettext("Tally every coin")}</h3>
         <p class="italic-fell text-muted mt-2">
-          {gettext("Recurring wages and sporadic bounties alike, month by month.")}
+          {gettext("Recurring tithes and sporadic bounties alike, month by month.")}
         </p>
       </div>
-      <div class="panel p-6 text-center group hover:border-[#d4a017] transition-colors">
+      <div class="panel p-6 text-center">
         <div class="text-4xl mb-3">🗺️</div>
-        <h3 class="font-medieval text-gold text-lg">{gettext("Map your year")}</h3>
+        <h3 class="font-medieval text-gold text-lg">{gettext("Chart the realm")}</h3>
         <p class="italic-fell text-muted mt-2">
-          {gettext("Twelve months at a glance — surplus in gold, deficit in crimson.")}
+          {gettext("Twelve moons at a glance — surplus in gold, deficit in crimson.")}
         </p>
       </div>
-      <div class="panel p-6 text-center group hover:border-[#7a5c1e] transition-colors">
+      <div class="panel p-6 text-center">
         <div class="text-4xl mb-3">📖</div>
         <h3 class="font-medieval text-gold text-lg">{gettext("Many ledgers")}</h3>
-        <p class="italic-fell text-muted mt-2">{gettext("Keep separate profiles for each purse you carry.")}</p>
+        <p class="italic-fell text-muted mt-2">{gettext("Keep separate tomes for each purse you carry.")}</p>
       </div>
     </div>
   </div>
 
   <%!-- How it works section --%>
   <div class="panel p-6 sm:p-8">
-    <h2 class="font-cinzel-decorative text-gold text-2xl text-center mb-8">📜 {gettext("How It Works")}</h2>
-    <div class="grid gap-6 sm:grid-cols-4 text-center">
+    <h2 class="font-cinzel-decorative text-gold text-2xl text-center mb-8">📜 {gettext("The Adventurer's Path")}</h2>
+    <div class="columns-panel grid-cols-4 text-center">
       <div>
         <div class="text-3xl mb-2">📚</div>
         <div class="font-cinzel text-lg text-[#7a5c1e] font-bold">I</div>
-        <p class="font-medieval text-cream text-sm mt-1">{gettext("Create a ledger")}</p>
+        <p class="font-medieval text-cream text-sm mt-1">{gettext("Forge a ledger")}</p>
       </div>
       <div>
         <div class="text-3xl mb-2">⚒️</div>
         <div class="font-cinzel text-lg text-[#7a5c1e] font-bold">II</div>
-        <p class="font-medieval text-cream text-sm mt-1">{gettext("Add income sources & expenses")}</p>
+        <p class="font-medieval text-cream text-sm mt-1">{gettext("Add wellsprings & levies")}</p>
       </div>
       <div>
         <div class="text-3xl mb-2">🪶</div>
         <div class="font-cinzel text-lg text-[#7a5c1e] font-bold">III</div>
-        <p class="font-medieval text-cream text-sm mt-1">{gettext("Log monthly values")}</p>
+        <p class="font-medieval text-cream text-sm mt-1">{gettext("Inscribe monthly records")}</p>
       </div>
       <div>
         <div class="text-3xl mb-2">👑</div>
         <div class="font-cinzel text-lg text-[#7a5c1e] font-bold">IV</div>
-        <p class="font-medieval text-cream text-sm mt-1">{gettext("See your financial map")}</p>
+        <p class="font-medieval text-cream text-sm mt-1">{gettext("Behold your treasury map")}</p>
       </div>
     </div>
   </div>

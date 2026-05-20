@@ -41,9 +41,9 @@
   --color-warning-content: #1a1208;
   --color-error: #8b1a1a;
   --color-error-content: #f0dfa0;
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.25rem;
+  --radius-selector: 0;
+  --radius-field: 0;
+  --radius-box: 0;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
   --border: 2px;
@@ -76,12 +76,6 @@ html, body {
   min-height: 100%;
 }
 
-body {
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(122, 92, 30, 0.07) 0%, transparent 60%),
-    #0d0b07 !important;
-}
-
 h1, h2, h3, h4, .font-heading {
   font-family: "Cinzel", serif;
   letter-spacing: 0.02em;
@@ -105,23 +99,41 @@ h1, h2, h3, h4, .font-heading {
 .text-cream { color: var(--idcal-cream); }
 .text-muted { color: var(--idcal-muted); }
 
-/* Chunky inventory-slot panels */
+/* Old-school inventory-slot panels — flat, no gradients, chunky beveled borders */
 .panel {
   background-color: #2e1f0e;
   border: 3px solid var(--idcal-border);
-  border-radius: 4px;
-  box-shadow:
-    inset 0 0 24px rgba(0, 0, 0, 0.55),
-    0 2px 6px rgba(0, 0, 0, 0.4);
+  border-top-color: #9a7a30;
+  border-left-color: #9a7a30;
+  border-right-color: #4a3510;
+  border-bottom-color: #4a3510;
 }
 
 .panel-title {
   font-family: "Cinzel", serif;
   font-weight: 700;
   color: var(--idcal-gold);
+  border-bottom: 2px solid var(--idcal-border);
+  padding-bottom: 0.4rem;
 }
 
-/* Medieval buttons */
+/* Column-style grid panels (RS stats interface) */
+.columns-panel {
+  display: grid;
+  background-color: #1a1208;
+  border: 3px solid var(--idcal-border);
+  border-top-color: #9a7a30;
+  border-left-color: #9a7a30;
+  border-right-color: #4a3510;
+  border-bottom-color: #4a3510;
+}
+
+.columns-panel > * {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--idcal-border);
+}
+
+/* Old-school buttons — flat, beveled, no gradients */
 .btn-medieval {
   display: inline-flex;
   align-items: center;
@@ -129,18 +141,26 @@ h1, h2, h3, h4, .font-heading {
   font-family: "Cinzel", serif;
   background-color: #6b3d0f;
   color: var(--idcal-cream);
-  border: 2px solid var(--idcal-border);
-  border-radius: 4px;
+  border: 2px solid;
+  border-top-color: #9a6a2a;
+  border-left-color: #9a6a2a;
+  border-right-color: #3a2008;
+  border-bottom-color: #3a2008;
   padding: 0.5rem 1rem;
-  transition: background-color 0.12s, border-color 0.12s;
   cursor: pointer;
 }
 .btn-medieval:hover {
   background-color: #8b5213;
-  border-color: var(--idcal-gold);
+  border-top-color: #d4a017;
+  border-left-color: #d4a017;
+  border-right-color: #4a3510;
+  border-bottom-color: #4a3510;
 }
 .btn-medieval:active {
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  border-top-color: #3a2008;
+  border-left-color: #3a2008;
+  border-right-color: #9a6a2a;
+  border-bottom-color: #9a6a2a;
 }
 .btn-medieval:disabled {
   opacity: 0.5;
@@ -148,27 +168,39 @@ h1, h2, h3, h4, .font-heading {
 }
 .btn-danger {
   background-color: #5a1212;
-  border-color: #8b1a1a;
+  border-top-color: #8b3030;
+  border-left-color: #8b3030;
+  border-right-color: #3a0808;
+  border-bottom-color: #3a0808;
 }
 .btn-danger:hover {
   background-color: #8b1a1a;
-  border-color: var(--idcal-gold);
+  border-top-color: #d4a017;
+  border-left-color: #d4a017;
+  border-right-color: #4a3510;
+  border-bottom-color: #4a3510;
 }
 
-/* Inputs */
+/* Inputs — inset bevel for recessed look */
 .input-medieval {
   background-color: #1a1208;
   color: var(--idcal-cream);
-  border: 2px solid var(--idcal-border);
-  border-radius: 4px;
+  border: 2px solid;
+  border-top-color: #3a2008;
+  border-left-color: #3a2008;
+  border-right-color: #9a7a30;
+  border-bottom-color: #9a7a30;
   padding: 0.4rem 0.6rem;
 }
 .input-medieval:focus {
   outline: none;
-  border-color: var(--idcal-gold);
+  border-top-color: #4a3510;
+  border-left-color: #4a3510;
+  border-right-color: #d4a017;
+  border-bottom-color: #d4a017;
 }
 
-/* Tables */
+/* Tables — flat borders, alternating rows */
 .table-medieval { width: 100%; border-collapse: collapse; }
 .table-medieval th {
   font-family: "Cinzel", serif;
@@ -183,4 +215,19 @@ h1, h2, h3, h4, .font-heading {
 }
 .table-medieval tbody tr:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Header bar — flat, chunky, no gradients */
+.header-bar {
+  background-color: #2e1f0e;
+  border-bottom: 3px solid var(--idcal-border);
+  border-bottom-color: #4a3510;
+  box-shadow: 0 3px 0 #9a7a30 inset;
+}
+
+/* Separator — thick flat divider line */
+.divider-medieval {
+  border: none;
+  border-top: 2px solid var(--idcal-border);
+  border-bottom: 1px solid #4a3510;
 }

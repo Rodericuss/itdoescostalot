@@ -11,7 +11,7 @@ defmodule IdcalWeb.IncomeLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, gettext("Income"))
+     |> assign(:page_title, gettext("Coffers"))
      |> assign(:profile, profile)
      |> assign(:categories, categories)
      |> assign(:category_form, nil)
@@ -74,7 +74,7 @@ defmodule IdcalWeb.IncomeLive.Index do
     {:noreply,
      socket
      |> assign(:categories, Finances.list_income_categories(socket.assigns.profile))
-     |> put_flash(:info, gettext("Category deleted."))}
+     |> put_flash(:info, gettext("Guild disbanded."))}
   end
 
   def handle_event("new_source", %{"category-id" => category_id}, socket) do
@@ -132,7 +132,7 @@ defmodule IdcalWeb.IncomeLive.Index do
     {:noreply,
      socket
      |> assign(:categories, Finances.list_income_categories(socket.assigns.profile))
-     |> put_flash(:info, gettext("Source deleted."))}
+     |> put_flash(:info, gettext("Wellspring dried up."))}
   end
 
   def handle_event("new_entry", %{"source-id" => source_id}, socket) do
@@ -200,7 +200,7 @@ defmodule IdcalWeb.IncomeLive.Index do
     {:noreply,
      socket
      |> assign(:categories, Finances.list_income_categories(socket.assigns.profile))
-     |> put_flash(:info, gettext("Entry deleted."))}
+     |> put_flash(:info, gettext("Record expunged."))}
   end
 
   @impl true
@@ -212,20 +212,20 @@ defmodule IdcalWeb.IncomeLive.Index do
           <.link navigate={~p"/profiles/#{@profile}"} class="text-muted hover:text-gold font-cinzel text-sm">
             &larr; {@profile.nickname}
           </.link>
-          <h1 class="font-cinzel-decorative font-bold text-3xl text-[#3d8b3d] mt-1">🪙 {gettext("Income")}</h1>
+          <h1 class="font-cinzel-decorative font-bold text-3xl text-[#3d8b3d] mt-1">🪙 {gettext("Coffers")}</h1>
         </div>
         <button phx-click="new_category" class="btn-medieval">
-          🏷️ {gettext("New Category")}
+          🏷️ {gettext("New Guild")}
         </button>
       </div>
 
-      <%!-- Category form (new or edit) --%>
+      <%!-- Guild form (new or edit) --%>
       <div :if={@category_form} class="panel p-5">
         <h2 class="panel-title text-lg mb-3">
-          {if @editing_category, do: gettext("Edit Category"), else: gettext("New Category")}
+          {if @editing_category, do: gettext("Edit Guild"), else: gettext("New Guild")}
         </h2>
         <.form for={@category_form} phx-submit="save_category" class="flex items-end gap-3">
-          <.input field={@category_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Salary, Freelance")} />
+          <.input field={@category_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Crown's Pay, Mercenary Work")} />
           <button type="submit" class="btn-medieval">{gettext("Save")}</button>
           <button type="button" phx-click="cancel_category" class="btn-medieval btn-danger">{gettext("Cancel")}</button>
         </.form>
@@ -235,7 +235,7 @@ defmodule IdcalWeb.IncomeLive.Index do
       <div :if={@categories == [] && !@category_form} class="panel p-10 text-center">
         <div class="text-5xl mb-3">🏚️</div>
         <p class="italic-fell text-muted mt-3">
-          {gettext("No income categories yet — create one to start tracking your coin.")}
+          {gettext("No guilds yet — establish one to start tallying your coin.")}
         </p>
       </div>
 
@@ -245,7 +245,7 @@ defmodule IdcalWeb.IncomeLive.Index do
           <h2 class="panel-title text-xl">⚜️ {category.name}</h2>
           <div class="flex gap-2">
             <button phx-click="new_source" phx-value-category-id={category.id} class="btn-medieval text-sm">
-              ⛏️ {gettext("Add Source")}
+              ⛏️ {gettext("Add Wellspring")}
             </button>
             <button phx-click="edit_category" phx-value-id={category.id} class="btn-medieval text-sm">
               <.icon name="hero-pencil-square" class="size-4" />
@@ -254,7 +254,7 @@ defmodule IdcalWeb.IncomeLive.Index do
               phx-click="delete_category"
               phx-value-id={category.id}
               class="btn-medieval btn-danger text-sm"
-              data-confirm={gettext("Delete this category and all its sources?")}
+              data-confirm={gettext("Disband this guild and all its wellsprings?")}
             >
               <.icon name="hero-trash" class="size-4" />
             </button>
@@ -264,19 +264,19 @@ defmodule IdcalWeb.IncomeLive.Index do
         <%!-- Source form for this category --%>
         <div :if={@source_form && to_string(@source_category_id) == to_string(category.id)} class="ml-4 border-l-2 border-[#7a5c1e] pl-4">
           <h3 class="font-cinzel text-gold text-sm mb-2">
-            {if @editing_source, do: gettext("Edit Source"), else: gettext("New Source")}
+            {if @editing_source, do: gettext("Edit Wellspring"), else: gettext("New Wellspring")}
           </h3>
           <.form for={@source_form} phx-submit="save_source" class="space-y-2">
             <input type="hidden" name="income_source[income_category_id]" value={category.id} />
             <div class="flex flex-wrap items-end gap-3">
-              <.input field={@source_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Client XPTO")} />
+              <.input field={@source_form[:name]} label={gettext("Name")} placeholder={gettext("e.g. Lord Pemberton")} />
               <.input
                 field={@source_form[:recurrence]}
                 type="select"
                 label={gettext("Recurrence")}
                 options={[{gettext("Monthly"), :monthly}, {gettext("Sporadic"), :sporadic}]}
               />
-              <.input field={@source_form[:base_amount]} type="number" label={gettext("Base Amount")} placeholder="0.00" step="0.01" min="0" />
+              <.input field={@source_form[:base_amount]} type="number" label={gettext("Base Tithe")} placeholder="0.00" step="0.01" min="0" />
             </div>
             <div class="flex gap-2">
               <button type="submit" class="btn-medieval">{gettext("Save")}</button>
@@ -298,12 +298,12 @@ defmodule IdcalWeb.IncomeLive.Index do
                   {if source.recurrence == :monthly, do: gettext("Monthly"), else: gettext("Sporadic")}
                 </span>
                 <span :if={source.base_amount} class="ml-2 text-muted text-sm">
-                  {gettext("Base:")} {Decimal.to_string(source.base_amount)}
+                  {gettext("Tithe:")} {Decimal.to_string(source.base_amount)}
                 </span>
               </div>
               <div class="flex gap-2">
                 <button phx-click="new_entry" phx-value-source-id={source.id} class="btn-medieval text-xs">
-                  <.icon name="hero-plus" class="size-3" /> {gettext("Entry")}
+                  <.icon name="hero-plus" class="size-3" /> {gettext("Record")}
                 </button>
                 <button phx-click="edit_source" phx-value-id={source.id} class="btn-medieval text-xs">
                   <.icon name="hero-pencil-square" class="size-3" />
@@ -312,7 +312,7 @@ defmodule IdcalWeb.IncomeLive.Index do
                   phx-click="delete_source"
                   phx-value-id={source.id}
                   class="btn-medieval btn-danger text-xs"
-                  data-confirm={gettext("Delete this source and all its entries?")}
+                  data-confirm={gettext("Dry up this wellspring and all its records?")}
                 >
                   <.icon name="hero-trash" class="size-3" />
                 </button>
@@ -322,7 +322,7 @@ defmodule IdcalWeb.IncomeLive.Index do
             <%!-- Entry form for this source --%>
             <div :if={@entry_form && @entry_source && @entry_source.id == source.id} class="mt-3 ml-4 border-l-2 border-[#3d8b3d] pl-3">
               <h4 class="font-cinzel text-[#3d8b3d] text-sm mb-2">
-                {if @editing_entry, do: gettext("Edit Entry"), else: gettext("New Entry")}
+                {if @editing_entry, do: gettext("Edit Record"), else: gettext("New Record")}
               </h4>
               <.form for={@entry_form} phx-submit="save_entry" class="space-y-2">
                 <input type="hidden" name="income_entry[income_source_id]" value={source.id} />
@@ -345,7 +345,7 @@ defmodule IdcalWeb.IncomeLive.Index do
         </div>
 
         <p :if={category.sources == []} class="ml-4 italic-fell text-muted text-sm">
-          🕸️ {gettext("No sources yet.")}
+          🕸️ {gettext("No wellsprings yet.")}
         </p>
       </div>
     </Layouts.app>
@@ -380,7 +380,7 @@ defmodule IdcalWeb.IncomeLive.Index do
                 phx-value-source-id={@source.id}
                 phx-value-id={entry.id}
                 class="text-muted hover:text-[#8b1a1a]"
-                data-confirm={gettext("Delete this entry?")}
+                data-confirm={gettext("Expunge this record?")}
               >
                 <.icon name="hero-trash" class="size-4" />
               </button>

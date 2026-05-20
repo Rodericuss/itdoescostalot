@@ -3,7 +3,7 @@ defmodule IdcalWeb.ProfileLive.Show do
 
   alias Idcal.Finances
 
-  @month_names ~w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
+  import IdcalWeb.FormatHelpers, only: [month_abbr: 1, format_short: 1]
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -51,28 +51,28 @@ defmodule IdcalWeb.ProfileLive.Show do
   end
 
   defp build_bar_chart(months) do
-    labels = Enum.map(months, fn %{month: m} -> Enum.at(@month_names, m - 1) end)
+    labels = Enum.map(months, fn %{month: m} -> month_abbr(m) end)
     income_data = Enum.map(months, fn %{income: i} -> Decimal.to_float(i) end)
     expense_data = Enum.map(months, fn %{expenses: e} -> Decimal.to_float(e) end)
 
     Jason.encode!(%{
       labels: labels,
       datasets: [
-        %{label: "Income", data: income_data, backgroundColor: "#3d8b3d"},
-        %{label: "Expenses", data: expense_data, backgroundColor: "#8b1a1a"}
+        %{label: gettext("Coffers"), data: income_data, backgroundColor: "#3d8b3d"},
+        %{label: gettext("Tributes"), data: expense_data, backgroundColor: "#8b1a1a"}
       ]
     })
   end
 
   defp build_line_chart(tracked_months, cumulative) do
-    labels = Enum.map(tracked_months, fn %{month: m} -> Enum.at(@month_names, m - 1) end)
+    labels = Enum.map(tracked_months, fn %{month: m} -> month_abbr(m) end)
     data = Enum.map(cumulative, &Decimal.to_float/1)
 
     Jason.encode!(%{
       labels: labels,
       datasets: [
         %{
-          label: "Cumulative Balance",
+          label: gettext("Amassed Hoard"),
           data: data,
           borderColor: "#d4a017",
           backgroundColor: "rgba(212, 160, 23, 0.1)",
@@ -118,10 +118,10 @@ defmodule IdcalWeb.ProfileLive.Show do
         </div>
         <div class="flex items-center gap-3">
           <.link navigate={~p"/profiles/#{@profile}/income"} class="btn-medieval text-sm">
-            🪙 {gettext("Income")}
+            🪙 {gettext("Coffers")}
           </.link>
           <.link navigate={~p"/profiles/#{@profile}/expenses"} class="btn-medieval text-sm">
-            💸 {gettext("Expenses")}
+            💸 {gettext("Tributes")}
           </.link>
           <.link navigate={~p"/profiles/#{@profile}/settings"} class="btn-medieval text-sm">
             <.icon name="hero-cog-6-tooth" class="size-4" />
@@ -162,7 +162,7 @@ defmodule IdcalWeb.ProfileLive.Show do
       <%!-- Charts --%>
       <div class="grid gap-6 lg:grid-cols-2">
         <div class="panel p-5">
-          <h2 class="panel-title text-lg mb-3">⚔️ {gettext("Income vs Expenses")}</h2>
+          <h2 class="panel-title text-lg mb-3">⚔️ {gettext("Coffers vs Tributes")}</h2>
           <canvas
             id={"bar-chart-#{@year}"}
             phx-hook="ChartHook"
@@ -172,7 +172,7 @@ defmodule IdcalWeb.ProfileLive.Show do
           />
         </div>
         <div class="panel p-5">
-          <h2 class="panel-title text-lg mb-3">📊 {gettext("Cumulative Balance")}</h2>
+          <h2 class="panel-title text-lg mb-3">📊 {gettext("Amassed Hoard")}</h2>
           <canvas
             id={"line-chart-#{@year}"}
             phx-hook="ChartHook"
@@ -185,8 +185,6 @@ defmodule IdcalWeb.ProfileLive.Show do
     </Layouts.app>
     """
   end
-
-  defp month_abbr(m), do: Enum.at(@month_names, m - 1)
 
   defp month_card_border(balance) do
     case Decimal.compare(balance, 0) do
@@ -203,7 +201,5 @@ defmodule IdcalWeb.ProfileLive.Show do
     end
   end
 
-  defp short_amount(decimal) do
-    decimal |> Decimal.round(0) |> Decimal.to_string(:normal)
-  end
+  defp short_amount(decimal), do: format_short(decimal)
 end
