@@ -175,23 +175,14 @@ mix ecto.migrate   # 📦  Run pending migrations
 | 5 — Monthly View | ✅ Done | Detailed month breakdown + charts |
 | 6 — Annual Dashboard | ✅ Done | 12-month overview + bar/line charts |
 | 7 — Polish & UX | ✅ Done | Validation, responsive, empty states |
-| 8 — i18n | 🔨 In Progress | en-US / pt-BR bilingual support |
-| 9 — Future | 📋 Planned | Budget goals, CSV export, themes |
-
-> 📖 Full details in [`ROADMAP.md`](ROADMAP.md)
-
----
-
-## 📚 Documentation
-
-| File | Contents |
-|---|---|
-| [`OVERVIEW.md`](OVERVIEW.md) | High-level concept and goals |
-| [`DOMAIN.md`](DOMAIN.md) | Data model and business rules |
-| [`FEATURES.md`](FEATURES.md) | Feature list with acceptance criteria |
-| [`DESIGN.md`](DESIGN.md) | UI/UX guidelines, colour palette, page map |
-| [`ROADMAP.md`](ROADMAP.md) | Phased implementation plan |
-| [`GLOSSARY.md`](GLOSSARY.md) | Canonical EN ↔ PT-BR term map |
+| 8 — i18n | ✅ Done | en-US / pt-BR bilingual support |
+| 9 — Budgeting & Goals | ✅ Done | Budget targets + savings goals |
+| 10 — Insights & Analytics | ✅ Done | Trends, averages, category drilldown |
+| 11 — Forecasting | ✅ Done | Cash flow projection + "what if" scenarios |
+| 12 — Data Management | ✅ Done | CSV export/import, templates, month cloning |
+| 13 — Notifications | ✅ Done | Monthly reminders + budget alerts |
+| 14 — Multi-user | ✅ Done | Shared profiles + profile comparison |
+| 15 — UX Enhancements | ✅ Done | Quick entry, search, calendar, themes, multi-currency |
 
 ---
 

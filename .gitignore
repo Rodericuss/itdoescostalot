@@ -35,3 +35,13 @@ idcal-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Claude documentation files
+CLAUDE.md
+AGENTS.md
+OVERVIEW.md
+DOMAIN.md
+FEATURES.md
+DESIGN.md
+ROADMAP.md
+GLOSSARY.md
+
