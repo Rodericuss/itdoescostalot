@@ -30,9 +30,14 @@ defmodule IdcalWeb.ProfileLive.Index do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="flex items-center justify-between">
         <h1 class="font-cinzel-decorative font-bold text-3xl text-gold">📜 {gettext("Your Ledgers")}</h1>
-        <.link navigate={~p"/profiles/new"} class="btn-medieval">
-          🔨 {gettext("New Ledger")}
-        </.link>
+        <div class="flex gap-2">
+          <.link :if={length(@profiles) >= 2} navigate={~p"/profiles/compare"} class="btn-medieval">
+            ⚖️ {gettext("Compare")}
+          </.link>
+          <.link navigate={~p"/profiles/new"} class="btn-medieval">
+            🔨 {gettext("New Ledger")}
+          </.link>
+        </div>
       </div>
 
       <div :if={@profiles == []} class="panel p-10 text-center">

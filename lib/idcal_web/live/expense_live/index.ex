@@ -26,7 +26,9 @@ defmodule IdcalWeb.ExpenseLive.Index do
      |> assign(:editing_type, nil)
      |> assign(:entry_form, nil)
      |> assign(:entry_type, nil)
-     |> assign(:editing_entry, nil)}
+     |> assign(:editing_entry, nil)
+     |> assign(:show_import, false)
+     |> allow_upload(:csv_file, accept: ~w(.csv), max_entries: 1, max_file_size: 1_000_000)}
   end
 
   @impl true
@@ -208,6 +210,61 @@ defmodule IdcalWeb.ExpenseLive.Index do
      |> put_flash(:info, gettext("Record expunged."))}
   end
 
+  def handle_event("toggle_pin", %{"id" => id}, socket) do
+    profile = socket.assigns.profile
+    category = Finances.get_expense_category!(profile, id)
+    {:ok, _} = Finances.toggle_pin_expense_category(category)
+    {:noreply, assign(socket, :categories, Finances.list_expense_categories(profile))}
+  end
+
+  def handle_event("validate_import", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("toggle_import", _params, socket) do
+    {:noreply, assign(socket, :show_import, !socket.assigns.show_import)}
+  end
+
+  def handle_event("import_csv", _params, socket) do
+    profile = socket.assigns.profile
+    today = Date.utc_today()
+
+    results =
+      consume_uploaded_entries(socket, :csv_file, fn %{path: path}, _entry ->
+        content = File.read!(path)
+        rows =
+          content
+          |> String.split("\n")
+          |> Enum.drop(1)
+          |> Enum.reject(&(String.trim(&1) == ""))
+          |> Enum.map(&parse_csv_row/1)
+
+        case Finances.import_expense_csv(profile, rows, today.year, today.month) do
+          {:ok, count} -> {:ok, count}
+          {:error, reason} -> {:ok, {:error, reason}}
+        end
+      end)
+
+    case results do
+      [{:error, reason}] ->
+        {:noreply, put_flash(socket, :error, "Import failed: #{inspect(reason)}")}
+
+      counts ->
+        total = Enum.sum(counts)
+        {:noreply,
+         socket
+         |> assign(:categories, Finances.list_expense_categories(profile))
+         |> assign(:show_import, false)
+         |> put_flash(:info, ngettext("%{count} entry imported.", "%{count} entries imported.", total))}
+    end
+  end
+
+  defp parse_csv_row(line) do
+    line
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -219,9 +276,29 @@ defmodule IdcalWeb.ExpenseLive.Index do
           </.link>
           <h1 class="font-cinzel-decorative font-bold text-3xl text-[#8b1a1a] mt-1">💸 {gettext("Tributes")}</h1>
         </div>
-        <button phx-click="new_category" class="btn-medieval">
-          🏷️ {gettext("New Guild")}
-        </button>
+        <div class="flex gap-2">
+          <button phx-click="new_category" class="btn-medieval">
+            🏷️ {gettext("New Guild")}
+          </button>
+          <button phx-click="toggle_import" class="btn-medieval">
+            📤 {gettext("Import CSV")}
+          </button>
+        </div>
+      </div>
+
+      <%!-- CSV Import --%>
+      <div :if={@show_import} class="panel p-5">
+        <h2 class="panel-title text-lg mb-3">📤 {gettext("Import CSV")}</h2>
+        <p class="text-muted text-xs italic-fell mb-3">
+          {gettext("CSV format: Category, Type, Amount, Note (optional). First row is skipped as header.")}
+        </p>
+        <.form for={%{}} phx-submit="import_csv" phx-change="validate_import" class="space-y-3">
+          <.live_file_input upload={@uploads.csv_file} class="text-cream text-sm" />
+          <div class="flex gap-2">
+            <button type="submit" class="btn-medieval">{gettext("Import")}</button>
+            <button type="button" phx-click="toggle_import" class="btn-medieval btn-danger">{gettext("Cancel")}</button>
+          </div>
+        </.form>
       </div>
 
       <%!-- Guild form --%>
@@ -253,7 +330,9 @@ defmodule IdcalWeb.ExpenseLive.Index do
       <div :for={category <- @categories} class="panel p-5 space-y-4">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="panel-title text-xl">⚜️ {category.name}</h2>
+            <h2 class="panel-title text-xl">
+              {if category.pinned, do: "📌", else: "⚜️"} {category.name}
+            </h2>
             <span :if={category.budget_limit} class="text-xs text-muted">
               {gettext("Gold Limit:")} {format_amount(category.budget_limit)}
             </span>
@@ -261,6 +340,9 @@ defmodule IdcalWeb.ExpenseLive.Index do
           <div class="flex gap-2">
             <button phx-click="new_type" phx-value-category-id={category.id} class="btn-medieval text-sm">
               ⛏️ {gettext("Add Levy")}
+            </button>
+            <button phx-click="toggle_pin" phx-value-id={category.id} class="btn-medieval text-sm" title={gettext("Pin")}>
+              {if category.pinned, do: "📌", else: "📍"}
             </button>
             <button phx-click="edit_category" phx-value-id={category.id} class="btn-medieval text-sm">
               <.icon name="hero-pencil-square" class="size-4" />

@@ -46,8 +46,50 @@ defmodule IdcalWeb.MonthLive.Show do
      |> assign(:total_expenses, total_expenses)
      |> assign(:balance, balance)
      |> assign(:chart_data, expense_chart_data(expense_groups))
-     |> assign(:budget_status, Finances.budget_status_for_month(profile, year, month))
-     |> assign(:expanded_category, nil)}
+     |> assign_budget_data(profile, year, month)
+     |> assign(:expanded_category, nil)
+     |> assign(:templates, Finances.list_month_templates(profile))
+     |> assign(:show_save_template, false)
+     |> assign(:template_name, "")}
+  end
+
+  defp mount_with_data_socket(socket, profile, year, month) do
+    income_breakdown = Finances.income_breakdown_for_month(profile, year, month)
+    expense_groups = Finances.expense_breakdown_grouped_by_category(profile, year, month)
+
+    total_income =
+      Enum.reduce(income_breakdown, Decimal.new(0), fn {_, amt}, acc -> Decimal.add(acc, amt) end)
+
+    total_expenses =
+      Enum.reduce(expense_groups, Decimal.new(0), fn {_, _, cat_total}, acc ->
+        Decimal.add(acc, cat_total)
+      end)
+
+    balance = Decimal.sub(total_income, total_expenses)
+
+    socket
+    |> assign(:income_breakdown, income_breakdown)
+    |> assign(:expense_groups, expense_groups)
+    |> assign(:total_income, total_income)
+    |> assign(:total_expenses, total_expenses)
+    |> assign(:balance, balance)
+    |> assign(:chart_data, expense_chart_data(expense_groups))
+    |> assign_budget_data(profile, year, month)
+  end
+
+  defp assign_budget_data(socket, profile, year, month) do
+    budget_status = Finances.budget_status_for_month(profile, year, month)
+
+    alerts =
+      Enum.filter(budget_status, fn {_cat, status} -> Decimal.gte?(status.percentage, 80) end)
+      |> Enum.map(fn {cat, status} ->
+        level = if Decimal.gte?(status.percentage, 100), do: :exceeded, else: :warning
+        %{name: cat.name, percentage: status.percentage, level: level}
+      end)
+
+    socket
+    |> assign(:budget_status, budget_status)
+    |> assign(:budget_alerts, alerts)
   end
 
   defp expense_chart_data(expense_groups) do
@@ -75,10 +117,74 @@ defmodule IdcalWeb.MonthLive.Show do
   end
 
   @impl true
+  def handle_event("clone_to_next", _params, socket) do
+    profile = socket.assigns.profile
+    {to_year, to_month} =
+      if socket.assigns.month == 12, do: {socket.assigns.year + 1, 1}, else: {socket.assigns.year, socket.assigns.month + 1}
+
+    case Finances.clone_month(profile, socket.assigns.year, socket.assigns.month, to_year, to_month) do
+      {:ok, count} ->
+        {:noreply, put_flash(socket, :info, ngettext("%{count} entry cloned.", "%{count} entries cloned.", count))}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, gettext("Clone failed."))}
+    end
+  end
+
   def handle_event("toggle_category", %{"id" => id}, socket) do
     current = socket.assigns.expanded_category
     new_id = String.to_integer(id)
     {:noreply, assign(socket, :expanded_category, if(current == new_id, do: nil, else: new_id))}
+  end
+
+  def handle_event("toggle_save_template", _params, socket) do
+    {:noreply, assign(socket, :show_save_template, !socket.assigns.show_save_template)}
+  end
+
+  def handle_event("save_template", %{"name" => name}, socket) do
+    profile = socket.assigns.profile
+
+    case Finances.save_month_as_template(profile, socket.assigns.year, socket.assigns.month, String.trim(name)) do
+      {:ok, _template} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("Template saved."))
+         |> assign(:templates, Finances.list_month_templates(profile))
+         |> assign(:show_save_template, false)
+         |> assign(:template_name, "")}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, gettext("Failed to save template."))}
+    end
+  end
+
+  def handle_event("apply_template", %{"template_id" => template_id}, socket) do
+    profile = socket.assigns.profile
+
+    case Finances.apply_month_template(profile, String.to_integer(template_id), socket.assigns.year, socket.assigns.month) do
+      {:ok, count} ->
+        socket = mount_with_data_socket(socket, profile, socket.assigns.year, socket.assigns.month)
+        {:noreply, put_flash(socket, :info, ngettext("%{count} entry applied.", "%{count} entries applied.", count))}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, gettext("Failed to apply template."))}
+    end
+  end
+
+  def handle_event("delete_template", %{"template_id" => template_id}, socket) do
+    profile = socket.assigns.profile
+    template = Finances.get_month_template!(profile, String.to_integer(template_id))
+
+    case Finances.delete_month_template(template) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("Template deleted."))
+         |> assign(:templates, Finances.list_month_templates(profile))}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, gettext("Failed to delete template."))}
+    end
   end
 
   @impl true
@@ -101,7 +207,85 @@ defmodule IdcalWeb.MonthLive.Show do
           <.link navigate={next_month_path(@profile, @year, @month)} class="btn-medieval text-sm">
             &rarr;
           </.link>
+          <.link href={~p"/profiles/#{@profile}/month/#{@year}/#{@month}/export"} class="btn-medieval text-sm">
+            📥 {gettext("Export CSV")}
+          </.link>
+          <button phx-click="clone_to_next" class="btn-medieval text-sm"
+            data-confirm={gettext("Clone sporadic entries to the next month?")}
+          >
+            📋 {gettext("Clone")}
+          </button>
+          <button phx-click="toggle_save_template" class="btn-medieval text-sm">
+            📜 {gettext("Templates")}
+          </button>
         </div>
+      </div>
+
+      <%!-- Template controls --%>
+      <div :if={@show_save_template} class="panel p-4">
+        <h3 class="font-cinzel text-gold text-sm mb-3">📜 {gettext("Month Templates")}</h3>
+        <div class="flex gap-3 mb-4">
+          <form phx-submit="save_template" class="flex gap-2 flex-1">
+            <input
+              type="text"
+              name="name"
+              value={@template_name}
+              placeholder={gettext("Template name...")}
+              class="input-medieval flex-1 text-sm"
+              required
+            />
+            <button type="submit" class="btn-medieval text-sm">
+              💾 {gettext("Save Current")}
+            </button>
+          </form>
+        </div>
+        <div :if={@templates != []} class="space-y-2">
+          <div :for={template <- @templates} class="flex justify-between items-center border-b border-[#7a5c1e]/30 pb-2">
+            <div>
+              <span class="text-cream text-sm font-cinzel">{template.name}</span>
+              <span class="text-muted text-xs ml-2">
+                ({ngettext("%{count} item", "%{count} items", length(template.items))})
+              </span>
+            </div>
+            <div class="flex gap-2">
+              <button
+                phx-click="apply_template"
+                phx-value-template_id={template.id}
+                class="btn-medieval text-xs"
+                data-confirm={gettext("Apply this template to the current month?")}
+              >
+                ▶ {gettext("Apply")}
+              </button>
+              <button
+                phx-click="delete_template"
+                phx-value-template_id={template.id}
+                class="btn-medieval text-xs text-[#8b1a1a]"
+                data-confirm={gettext("Delete this template?")}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+        <p :if={@templates == []} class="italic-fell text-muted text-sm">
+          {gettext("No templates saved yet.")}
+        </p>
+      </div>
+
+      <%!-- Budget alerts --%>
+      <div :for={alert <- @budget_alerts} class={[
+        "p-3 border text-sm flex items-center gap-2",
+        if(alert.level == :exceeded,
+          do: "bg-[#8b1a1a]/20 border-[#8b1a1a] text-[#ff6b6b]",
+          else: "bg-[#d4a017]/20 border-[#d4a017] text-[#d4a017]")
+      ]}>
+        <span>{if alert.level == :exceeded, do: "🚨", else: "⚠️"}</span>
+        <span :if={alert.level == :exceeded}>
+          {gettext("Guild %{name} hath exceeded its gold limit! (%{pct}%)", name: alert.name, pct: Decimal.to_string(alert.percentage))}
+        </span>
+        <span :if={alert.level == :warning}>
+          {gettext("Guild %{name} approaches its gold limit (%{pct}%)", name: alert.name, pct: Decimal.to_string(alert.percentage))}
+        </span>
       </div>
 
       <%!-- Net Balance --%>

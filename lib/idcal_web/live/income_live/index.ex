@@ -203,6 +203,13 @@ defmodule IdcalWeb.IncomeLive.Index do
      |> put_flash(:info, gettext("Record expunged."))}
   end
 
+  def handle_event("toggle_pin", %{"id" => id}, socket) do
+    profile = socket.assigns.profile
+    category = Finances.get_income_category!(profile, id)
+    {:ok, _} = Finances.toggle_pin_income_category(category)
+    {:noreply, assign(socket, :categories, Finances.list_income_categories(profile))}
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -242,10 +249,15 @@ defmodule IdcalWeb.IncomeLive.Index do
       <%!-- Category list --%>
       <div :for={category <- @categories} class="panel p-5 space-y-4">
         <div class="flex items-center justify-between">
-          <h2 class="panel-title text-xl">⚜️ {category.name}</h2>
+          <h2 class="panel-title text-xl">
+            {if category.pinned, do: "📌", else: "⚜️"} {category.name}
+          </h2>
           <div class="flex gap-2">
             <button phx-click="new_source" phx-value-category-id={category.id} class="btn-medieval text-sm">
               ⛏️ {gettext("Add Wellspring")}
+            </button>
+            <button phx-click="toggle_pin" phx-value-id={category.id} class="btn-medieval text-sm" title={gettext("Pin")}>
+              {if category.pinned, do: "📌", else: "📍"}
             </button>
             <button phx-click="edit_category" phx-value-id={category.id} class="btn-medieval text-sm">
               <.icon name="hero-pencil-square" class="size-4" />

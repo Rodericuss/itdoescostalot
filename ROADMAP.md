@@ -130,10 +130,10 @@
 
 ## Phase 12 — Data Management
 
-- [ ] CSV export of monthly data
-- [ ] CSV import: parse bank statements to auto-populate sporadic entries
-- [ ] Duplicate/clone month: copy all sporadic entries from one month to another
-- [ ] Templates: save a month's entry pattern and apply it to future months
+- [x] CSV export of monthly data
+- [x] CSV import: parse bank statements to auto-populate sporadic entries
+- [x] Duplicate/clone month: copy all sporadic entries from one month to another
+- [x] Templates: save a month's entry pattern and apply it to future months
 
 **Deliverable:** User can move data in and out efficiently and reduce repetitive entry.
 
@@ -141,8 +141,8 @@
 
 ## Phase 13 — Notifications & Reminders
 
-- [ ] Monthly check-in reminder email ("Hark! The month hath ended. Review thy ledger.")
-- [ ] Budget alert: notify when approaching or exceeding a category budget
+- [x] Monthly check-in reminder email ("Hark! The month hath ended. Review thy ledger.")
+- [x] Budget alert: notify when approaching or exceeding a category budget
 
 **Deliverable:** App reaches out to the user to stay on top of finances.
 
@@ -150,8 +150,8 @@
 
 ## Phase 14 — Multi-user & Social
 
-- [ ] Shared profiles: two users can share a profile (couples managing joint finances)
-- [ ] Profile comparison: side-by-side view of two profiles (e.g. Personal vs Freelance)
+- [x] Shared profiles: two users can share a profile (couples managing joint finances)
+- [x] Profile comparison: side-by-side view of two profiles (e.g. Personal vs Freelance)
 
 **Deliverable:** Profiles can be collaborative and comparable.
 
@@ -159,9 +159,9 @@
 
 ## Phase 15 — UX Enhancements
 
-- [ ] Quick entry mode: minimal form to log a sporadic expense fast (category → type → amount → done)
-- [ ] Pinned/favorite categories at the top
-- [ ] Notes search: search entries by note text
-- [ ] Recurring entry calendar view with highlighted gaps
-- [ ] Dark/light theme toggle (keep medieval palette, just adjust brightness)
-- [ ] Multiple currencies per profile
+- [x] Quick entry mode: minimal form to log a sporadic expense fast (category → type → amount → done)
+- [x] Pinned/favorite categories at the top
+- [x] Notes search: search entries by note text
+- [x] Recurring entry calendar view with highlighted gaps
+- [x] Dark/light theme toggle (keep medieval palette, just adjust brightness)
+- [x] Multiple currencies per profile

@@ -12,8 +12,7 @@ defmodule Idcal.Application do
       Idcal.Repo,
       {DNSCluster, query: Application.get_env(:idcal, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Idcal.PubSub},
-      # Start a worker by calling: Idcal.Worker.start_link(arg)
-      # {Idcal.Worker, arg},
+      Idcal.Finances.ReminderScheduler,
       # Start to serve requests, typically the last entry
       IdcalWeb.Endpoint
     ]

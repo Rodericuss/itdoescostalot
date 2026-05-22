@@ -176,6 +176,50 @@ A manual contribution toward a savings goal for a specific month.
 
 ---
 
+### MonthTemplate
+A saved pattern of sporadic entries that can be re-applied to future months.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| profile_id | bigint | FK → Profile |
+| name | string | unique per profile |
+
+---
+
+### MonthTemplateItem
+A single entry within a month template, storing the snapshot of a sporadic entry.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| month_template_id | bigint | FK → MonthTemplate |
+| kind | string | "income" or "expense" |
+| category_name | string | name of the category at save time |
+| name | string | name of the source/type at save time |
+| amount | decimal | amount at save time |
+| note | string | optional |
+
+> When applying a template, items are matched by kind + category_name + name to existing sporadic sources/types. Items with no match are skipped. Existing entries in the target month are not overwritten.
+
+---
+
+### ProfileShare
+Grants another user access to a profile.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | bigint | PK |
+| profile_id | bigint | FK → Profile |
+| user_id | bigint | FK → User |
+| role | string | "viewer" or "editor" |
+
+> Unique per profile + user. Owner cannot share with themselves.
+
+> **Rule — Access Resolution:** `list_profiles` and `get_profile!` include profiles where the user is either the owner OR has a ProfileShare record. Write operations should check `can_edit_profile?` which returns true for owners and editors.
+
+---
+
 ## Core Calculation: Monthly Balance
 
 ```elixir

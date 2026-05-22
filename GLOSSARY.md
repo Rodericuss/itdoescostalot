@@ -45,6 +45,23 @@ UI strings, flavor text) must stay consistent with this table.
 | Contribution | Contribution | Contribuição |
 | Target amount | Target Amount | Valor Alvo |
 | Deadline | Deadline | Prazo |
+| Month template | Template / Scroll | Pergaminho |
+| Clone month | Clone | Clonar |
+| Budget alert | Budget Alert | Alerta de Orçamento |
+| Reminder | Reminder | Lembrete |
+| Profile share | Shared Adventurer | Aventureiro Compartilhado |
+| Viewer (role) | Viewer | Visualizador |
+| Editor (role) | Editor | Editor |
+| Compare profiles | Compare Ledgers | Comparar Livros-razão |
+| Quick entry | Quick Entry | Entrada Rápida |
+| Search notes | Search Notes | Buscar Notas |
+| Pin category | Pin | Fixar |
+| Calendar | Calendar | Calendário |
+| Recurring calendar | Recurring Calendar | Calendário Recorrente |
+| Currency | Currency | Moeda |
+| Theme | Theme | Tema |
+| Dark (theme) | Dark | Escuro |
+| Light (theme) | Light | Claro |
 
 ---
 
@@ -66,6 +83,12 @@ UI strings, flavor text) must stay consistent with this table.
 | Add | Add | Adicionar |
 | Language | Language | Idioma |
 | Year selector | Year | Ano |
+| Export CSV | Export CSV | Exportar CSV |
+| Import CSV | Import CSV | Importar CSV |
+| Clone | Clone | Clonar |
+| Templates | Templates | Pergaminhos |
+| Apply | Apply | Aplicar |
+| Save Current | Save Current | Salvar Atual |
 
 ---
 
@@ -107,6 +130,17 @@ Flavor text keeps the RuneScape-era medieval mood. Portuguese versions preserve 
 | To reach thy goal, thou must save X per month. | Para alcançar teu objetivo, deves poupar X por mês. |
 | The deadline hath passed and the quest remains unfinished. | O prazo já passou e a missão permanece inacabada. |
 | Abandon this quest? | Abandonar esta missão? |
+| No templates saved yet. | Nenhum pergaminho salvo ainda. |
+| Template saved. | Pergaminho salvo. |
+| Template deleted. | Pergaminho apagado. |
+| Clone sporadic entries to the next month? | Clonar entradas esporádicas para o próximo mês? |
+| Apply this template to the current month? | Aplicar este pergaminho ao mês atual? |
+| Guild X hath exceeded its gold limit! | Guilda X excedeu o limite de ouro! |
+| Guild X approaches its gold limit | Guilda X aproxima-se do limite de ouro |
+| Hark! The month hath ended — review thy ledger. | Ouça! O mês findou — revise teu livro-razão. |
+| Invite another adventurer to view or edit this ledger. | Convide outro aventureiro para visualizar ou editar este livro-razão. |
+| No adventurers share this ledger yet. | Nenhum aventureiro compartilha este livro-razão ainda. |
+| Select two ledgers above to compare their chronicles. | Selecione dois livros-razão acima para comparar suas crônicas. |
 
 ---
 

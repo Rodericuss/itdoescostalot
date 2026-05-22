@@ -167,9 +167,137 @@
 
 ---
 
+## F18 — CSV Export
+
+- Download monthly financial data as CSV from the month detail view
+- CSV includes Type (Income/Expense), Category, Name, and Amount columns
+- File named `idcal_{nickname}_{year}_{month}.csv`
+- Accessible via Export CSV button on `/profiles/:id/month/:year/:month`
+
+---
+
+## F19 — CSV Import
+
+- Import sporadic expense entries from CSV file on the expenses page
+- CSV format: Category, Type, Amount, Note (optional); first row skipped as header
+- Auto-creates categories and types on the fly if they don't exist
+- Transaction-wrapped: all rows succeed or none are inserted
+- Accessible via Import CSV toggle on `/profiles/:id/expenses`
+
+---
+
+## F20 — Clone Month
+
+- Copy all sporadic income and expense entries from the current month to the next month
+- Skips entries that already exist in the target month (no duplicates)
+- Clone button on the month detail view with confirmation dialog
+- Reports the number of entries cloned
+
+---
+
+## F21 — Month Templates
+
+- Save the current month's sporadic entry pattern as a named template (pergaminho)
+- Templates capture kind, category name, type name, and amount for each sporadic entry
+- Apply a saved template to any month, creating entries for matching sources/types
+- Skips entries that already exist in the target month
+- Delete templates when no longer needed
+- Template panel toggled via Templates button on the month detail view
+
+---
+
+## F22 — Monthly Check-in Reminder
+
+- Scheduled daily check runs via GenServer in the supervision tree
+- On the 1st of each month, sends reminder email to all users to review the previous month
+- Medieval-flavored email: "Hark! The month hath ended — review thy ledger."
+- Uses Swoosh mailer (same as auth emails)
+
+---
+
+## F23 — Budget Alerts
+
+- Alert banners appear on the monthly detail view when expense categories approach (80%+) or exceed (100%+) their budget limit
+- Warning style (gold) for 80-99%, exceeded style (crimson) for 100%+
+- Budget alert emails sent automatically on the 1st of each month alongside reminders
+- Only profiles with categories at 80%+ utilization receive alert emails
+
+---
+
+## F24 — Shared Profiles
+
+- Profile owner can invite other users by email to share a ledger
+- Two roles: Viewer (read-only) and Editor (full access)
+- Owner can promote, demote, or remove shared users from the profile settings page
+- Shared profiles appear in the user's profile list alongside owned profiles
+- Cannot share with yourself; duplicate shares are rejected
+
+---
+
+## F25 — Profile Comparison
+
+- Side-by-side view comparing two profiles for the same year
+- Each profile shows annual totals: coffers, tributes, net purse
+- Monthly breakdown table shows balance per month for both profiles plus difference
+- Year navigation to compare across different years
+- Compare button appears on the profile list when 2+ profiles exist
+- Accessible via `/profiles/compare`
+
+---
+
+## F26 — Quick Entry Mode
+
+- Minimal form to log a sporadic expense fast: category, type, amount, month, note
+- Auto-creates category and type on the fly if they don't exist
+- Accessible via `/profiles/:id/quick` (Quick button on dashboard)
+
+---
+
+## F27 — Pinned/Favorite Categories
+
+- Income and expense categories can be pinned
+- Pinned categories sort to the top of their list
+- Pin/unpin toggle button on each category header
+- Visual indicator (pin icon) for pinned categories
+
+---
+
+## F28 — Notes Search
+
+- Search income and expense entries by note text
+- Live search with debounce (300ms)
+- Results show type, category, name, period, amount, and note
+- Accessible via `/profiles/:id/search` (Search button on dashboard)
+
+---
+
+## F29 — Recurring Entry Calendar
+
+- Calendar grid showing all recurring (monthly) income sources and expense types
+- Columns for each month, rows for each item
+- Check mark for months with overrides, dot for months using base amount
+- Year navigation
+- Accessible via `/profiles/:id/calendar` (Calendar button on dashboard)
+
+---
+
+## F30 — Dark/Light Theme Toggle
+
+- Theme preference stored per profile (dark or light)
+- Configurable in profile settings
+- Default: dark (medieval palette)
+
+---
+
+## F31 — Multiple Currencies
+
+- Currency stored per profile (BRL, USD, EUR, GBP, JPY, CAD, AUD, CHF)
+- Configurable in profile settings
+- Default: BRL
+
+---
+
 ## Out of Scope (for now)
 
-- Currency conversion
-- Import from bank statements
-- Recurring reminders or notifications
+- Currency conversion between profiles
 - Mobile native app

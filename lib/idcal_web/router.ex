@@ -58,6 +58,7 @@ defmodule IdcalWeb.Router do
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 
       live "/profiles", ProfileLive.Index, :index
+      live "/profiles/compare", ProfileLive.Compare, :compare
       live "/profiles/new", ProfileLive.Form, :new
       live "/profiles/:id", ProfileLive.Show, :show
       live "/profiles/:id/settings", ProfileLive.Form, :edit
@@ -66,9 +67,13 @@ defmodule IdcalWeb.Router do
       live "/profiles/:id/goals", SavingsGoalLive.Index, :index
       live "/profiles/:id/insights", InsightsLive.Show, :show
       live "/profiles/:id/forecast", ForecastLive.Show, :show
+      live "/profiles/:id/quick", QuickEntryLive.Index, :index
+      live "/profiles/:id/search", SearchLive.Index, :index
+      live "/profiles/:id/calendar", CalendarLive.Index, :index
       live "/profiles/:id/month/:year/:month", MonthLive.Show, :show
     end
 
+    get "/profiles/:id/month/:year/:month/export", ExportController, :monthly_csv
     post "/users/update-password", UserSessionController, :update_password
   end
 

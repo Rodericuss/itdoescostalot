@@ -142,6 +142,15 @@ defmodule IdcalWeb.ProfileLive.Show do
           <.link navigate={~p"/profiles/#{@profile}/forecast"} class="btn-medieval text-sm">
             🔮 {gettext("Forecast")}
           </.link>
+          <.link navigate={~p"/profiles/#{@profile}/quick"} class="btn-medieval text-sm">
+            ⚡ {gettext("Quick")}
+          </.link>
+          <.link navigate={~p"/profiles/#{@profile}/search"} class="btn-medieval text-sm">
+            🔎 {gettext("Search")}
+          </.link>
+          <.link navigate={~p"/profiles/#{@profile}/calendar"} class="btn-medieval text-sm">
+            📅 {gettext("Calendar")}
+          </.link>
           <.link navigate={~p"/profiles/#{@profile}/settings"} class="btn-medieval text-sm">
             <.icon name="hero-cog-6-tooth" class="size-4" />
           </.link>

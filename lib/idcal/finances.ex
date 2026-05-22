@@ -9,22 +9,46 @@ defmodule Idcal.Finances do
   alias Idcal.Finances.{Profile, IncomeCategory, IncomeSource, IncomeEntry}
   alias Idcal.Finances.{ExpenseCategory, ExpenseType, ExpenseEntry}
   alias Idcal.Finances.{BudgetOverride, SavingsGoal, SavingsContribution}
+  alias Idcal.Finances.{MonthTemplate, MonthTemplateItem}
+  alias Idcal.Finances.ProfileShare
 
   ## Profiles
 
-  @doc "Lists all profiles owned by the scoped user."
+  @doc "Lists all profiles owned by or shared with the scoped user."
   def list_profiles(%Scope{} = scope) do
+    shared_ids =
+      ProfileShare
+      |> where(user_id: ^scope.user.id)
+      |> select([s], s.profile_id)
+
     Profile
-    |> where(user_id: ^scope.user.id)
+    |> where([p], p.user_id == ^scope.user.id or p.id in subquery(shared_ids))
     |> order_by(asc: :nickname)
     |> Repo.all()
   end
 
-  @doc "Fetches a profile owned by the scoped user. Raises if not found."
+  @doc "Fetches a profile owned by or shared with the scoped user. Raises if not found."
   def get_profile!(%Scope{} = scope, id) do
+    shared_ids =
+      ProfileShare
+      |> where(user_id: ^scope.user.id)
+      |> select([s], s.profile_id)
+
     Profile
-    |> where(user_id: ^scope.user.id)
+    |> where([p], p.user_id == ^scope.user.id or p.id in subquery(shared_ids))
     |> Repo.get!(id)
+  end
+
+  @doc "Checks if the user can edit a profile (owner or editor share)."
+  def can_edit_profile?(%Scope{} = scope, %Profile{} = profile) do
+    if profile.user_id == scope.user.id do
+      true
+    else
+      Repo.exists?(
+        from s in ProfileShare,
+          where: s.profile_id == ^profile.id and s.user_id == ^scope.user.id and s.role == "editor"
+      )
+    end
   end
 
   @doc "Creates a profile owned by the scoped user."
@@ -51,13 +75,53 @@ defmodule Idcal.Finances do
     Profile.changeset(profile, attrs)
   end
 
+  ## Profile sharing
+
+  @doc "Lists all shares for a profile, with user preloaded."
+  def list_profile_shares(%Profile{} = profile) do
+    ProfileShare
+    |> where(profile_id: ^profile.id)
+    |> preload(:user)
+    |> order_by(asc: :inserted_at)
+    |> Repo.all()
+  end
+
+  @doc "Shares a profile with a user by email. Returns error if user not found or already shared."
+  def share_profile(%Profile{} = profile, email, role \\ "viewer") do
+    case Idcal.Accounts.get_user_by_email(email) do
+      nil ->
+        {:error, :user_not_found}
+
+      user ->
+        if user.id == profile.user_id do
+          {:error, :cannot_share_with_self}
+        else
+          %ProfileShare{profile_id: profile.id, user_id: user.id}
+          |> ProfileShare.changeset(%{role: role})
+          |> Repo.insert()
+        end
+    end
+  end
+
+  @doc "Updates the role of a profile share."
+  def update_profile_share(%ProfileShare{} = share, attrs) do
+    share
+    |> ProfileShare.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc "Removes a profile share."
+  def delete_profile_share(%ProfileShare{} = share) do
+    Repo.delete(share)
+  end
+
   ## Income categories
 
   @doc "Lists income categories of a profile, with their sources preloaded."
   def list_income_categories(%Profile{} = profile) do
     IncomeCategory
     |> where(profile_id: ^profile.id)
-    |> order_by(asc: :name)
+    |> order_by([c], [desc: c.pinned, asc: c.name])
     |> preload(
       sources: ^from(s in IncomeSource, order_by: s.name, preload: [entries: ^from(e in IncomeEntry, order_by: [desc: e.year, desc: e.month])])
     )
@@ -195,7 +259,7 @@ defmodule Idcal.Finances do
   def list_expense_categories(%Profile{} = profile) do
     ExpenseCategory
     |> where(profile_id: ^profile.id)
-    |> order_by(asc: :name)
+    |> order_by([c], [desc: c.pinned, asc: c.name])
     |> preload(
       types: ^from(t in ExpenseType, order_by: t.name, preload: [entries: ^from(e in ExpenseEntry, order_by: [desc: e.year, desc: e.month])])
     )
@@ -289,6 +353,246 @@ defmodule Idcal.Finances do
 
   def change_expense_entry(%ExpenseEntry{} = entry, attrs \\ %{}) do
     ExpenseEntry.changeset(entry, attrs)
+  end
+
+  ## CSV Import
+
+  @doc """
+  Imports sporadic expense entries from CSV rows.
+  Each row is `[category_name, type_name, amount, note]`.
+  Creates categories/types on the fly if they don't exist.
+  Returns `{:ok, count}` or `{:error, reason}`.
+  """
+  def import_expense_csv(%Profile{} = profile, rows, year, month) do
+    Repo.transaction(fn ->
+      Enum.reduce(rows, 0, fn row, count ->
+        case row do
+          [cat_name, type_name, amount_str | rest] ->
+            note = List.first(rest)
+            case Decimal.parse(String.trim(amount_str)) do
+              {amount, ""} ->
+                category = find_or_create_expense_category!(profile, String.trim(cat_name))
+                type = find_or_create_expense_type!(profile, category, String.trim(type_name))
+                {:ok, _} = create_expense_entry(type, %{
+                  "year" => year,
+                  "month" => month,
+                  "amount" => amount,
+                  "note" => if(note, do: String.trim(note), else: nil)
+                })
+                count + 1
+
+              _ -> count
+            end
+
+          _ -> count
+        end
+      end)
+    end)
+  end
+
+  defp find_or_create_expense_category!(profile, name) do
+    case Repo.one(from c in ExpenseCategory, where: c.profile_id == ^profile.id and c.name == ^name) do
+      nil ->
+        {:ok, cat} = create_expense_category(profile, %{"name" => name})
+        cat
+      cat -> cat
+    end
+  end
+
+  defp find_or_create_expense_type!(profile, category, name) do
+    case Repo.one(from t in ExpenseType, where: t.profile_id == ^profile.id and t.expense_category_id == ^category.id and t.name == ^name) do
+      nil ->
+        {:ok, type} = create_expense_type(profile, %{
+          "name" => name,
+          "expense_category_id" => category.id,
+          "recurrence" => "sporadic"
+        })
+        type
+      type -> type
+    end
+  end
+
+  ## Clone month
+
+  @doc "Copies all sporadic income and expense entries from one month to another."
+  def clone_month(%Profile{} = profile, from_year, from_month, to_year, to_month) do
+    Repo.transaction(fn ->
+      income_count = clone_income_entries(profile, from_year, from_month, to_year, to_month)
+      expense_count = clone_expense_entries(profile, from_year, from_month, to_year, to_month)
+      income_count + expense_count
+    end)
+  end
+
+  defp clone_income_entries(profile, from_year, from_month, to_year, to_month) do
+    sources =
+      IncomeSource
+      |> where(profile_id: ^profile.id, recurrence: :sporadic)
+      |> Repo.all()
+
+    source_ids = Enum.map(sources, & &1.id)
+
+    entries =
+      IncomeEntry
+      |> where([e], e.income_source_id in ^source_ids and e.year == ^from_year and e.month == ^from_month)
+      |> Repo.all()
+
+    Enum.reduce(entries, 0, fn entry, count ->
+      existing = Repo.one(from e in IncomeEntry,
+        where: e.income_source_id == ^entry.income_source_id and e.year == ^to_year and e.month == ^to_month)
+
+      if existing do
+        count
+      else
+        source = Enum.find(sources, &(&1.id == entry.income_source_id))
+        {:ok, _} = create_income_entry(source, %{
+          "year" => to_year, "month" => to_month,
+          "amount" => entry.amount, "note" => entry.note
+        })
+        count + 1
+      end
+    end)
+  end
+
+  defp clone_expense_entries(profile, from_year, from_month, to_year, to_month) do
+    types =
+      ExpenseType
+      |> where(profile_id: ^profile.id, recurrence: :sporadic)
+      |> Repo.all()
+
+    type_ids = Enum.map(types, & &1.id)
+
+    entries =
+      ExpenseEntry
+      |> where([e], e.expense_type_id in ^type_ids and e.year == ^from_year and e.month == ^from_month)
+      |> Repo.all()
+
+    Enum.reduce(entries, 0, fn entry, count ->
+      existing = Repo.one(from e in ExpenseEntry,
+        where: e.expense_type_id == ^entry.expense_type_id and e.year == ^to_year and e.month == ^to_month)
+
+      if existing do
+        count
+      else
+        type = Enum.find(types, &(&1.id == entry.expense_type_id))
+        {:ok, _} = create_expense_entry(type, %{
+          "year" => to_year, "month" => to_month,
+          "amount" => entry.amount, "note" => entry.note
+        })
+        count + 1
+      end
+    end)
+  end
+
+  ## Month templates
+
+  @doc "Lists all month templates for a profile."
+  def list_month_templates(%Profile{} = profile) do
+    MonthTemplate
+    |> where(profile_id: ^profile.id)
+    |> order_by(asc: :name)
+    |> preload(:items)
+    |> Repo.all()
+  end
+
+  @doc "Fetches a month template by id. Raises if not found."
+  def get_month_template!(%Profile{} = profile, id) do
+    MonthTemplate
+    |> where(profile_id: ^profile.id)
+    |> preload(:items)
+    |> Repo.get!(id)
+  end
+
+  @doc "Saves the current month's sporadic entries as a named template."
+  def save_month_as_template(%Profile{} = profile, year, month, name) do
+    income_rows = income_breakdown_for_month(profile, year, month)
+    expense_rows = expense_breakdown_for_month(profile, year, month)
+
+    income_items =
+      income_rows
+      |> Enum.filter(fn {source, _} -> source.recurrence == :sporadic end)
+      |> Enum.map(fn {source, amount} ->
+        %{kind: "income", category_name: source.income_category.name, name: source.name, amount: amount}
+      end)
+
+    expense_items =
+      expense_rows
+      |> Enum.filter(fn {type, _} -> type.recurrence == :sporadic end)
+      |> Enum.map(fn {type, amount} ->
+        %{kind: "expense", category_name: type.expense_category.name, name: type.name, amount: amount}
+      end)
+
+    items = income_items ++ expense_items
+
+    Repo.transaction(fn ->
+      {:ok, template} =
+        %MonthTemplate{profile_id: profile.id}
+        |> MonthTemplate.changeset(%{name: name})
+        |> Repo.insert()
+
+      Enum.each(items, fn item_attrs ->
+        %MonthTemplateItem{month_template_id: template.id}
+        |> MonthTemplateItem.changeset(item_attrs)
+        |> Repo.insert!()
+      end)
+
+      Repo.preload(template, :items)
+    end)
+  end
+
+  @doc "Applies a template's items to a target month, creating entries for matching sources/types."
+  def apply_month_template(%Profile{} = profile, template_id, year, month) do
+    template = get_month_template!(profile, template_id)
+
+    Repo.transaction(fn ->
+      count =
+        Enum.reduce(template.items, 0, fn item, acc ->
+          case apply_template_item(profile, item, year, month) do
+            {:ok, _} -> acc + 1
+            :skip -> acc
+          end
+        end)
+
+      count
+    end)
+  end
+
+  defp apply_template_item(profile, %MonthTemplateItem{kind: "income"} = item, year, month) do
+    source =
+      IncomeSource
+      |> where(profile_id: ^profile.id, name: ^item.name, recurrence: :sporadic)
+      |> preload(:income_category)
+      |> Repo.one()
+
+    cond do
+      is_nil(source) -> :skip
+      source.income_category.name != item.category_name -> :skip
+      true ->
+        existing = Repo.one(from e in IncomeEntry,
+          where: e.income_source_id == ^source.id and e.year == ^year and e.month == ^month)
+        if existing, do: :skip, else: create_income_entry(source, %{"year" => year, "month" => month, "amount" => item.amount, "note" => item.note})
+    end
+  end
+
+  defp apply_template_item(profile, %MonthTemplateItem{kind: "expense"} = item, year, month) do
+    type =
+      ExpenseType
+      |> where(profile_id: ^profile.id, name: ^item.name, recurrence: :sporadic)
+      |> preload(:expense_category)
+      |> Repo.one()
+
+    cond do
+      is_nil(type) -> :skip
+      type.expense_category.name != item.category_name -> :skip
+      true ->
+        existing = Repo.one(from e in ExpenseEntry,
+          where: e.expense_type_id == ^type.id and e.year == ^year and e.month == ^month)
+        if existing, do: :skip, else: create_expense_entry(type, %{"year" => year, "month" => month, "amount" => item.amount, "note" => item.note})
+    end
+  end
+
+  @doc "Deletes a month template."
+  def delete_month_template(%MonthTemplate{} = template) do
+    Repo.delete(template)
   end
 
   ## Expense resolution
@@ -692,6 +996,110 @@ defmodule Idcal.Finances do
       months_left: months_left,
       required_monthly: required_monthly
     }
+  end
+
+  ## Pin/unpin categories
+
+  @doc "Toggles the pinned status of an income category."
+  def toggle_pin_income_category(%IncomeCategory{} = category) do
+    category
+    |> IncomeCategory.changeset(%{pinned: !category.pinned})
+    |> Repo.update()
+  end
+
+  @doc "Toggles the pinned status of an expense category."
+  def toggle_pin_expense_category(%ExpenseCategory{} = category) do
+    category
+    |> ExpenseCategory.changeset(%{pinned: !category.pinned})
+    |> Repo.update()
+  end
+
+  ## Notes search
+
+  @doc "Searches income and expense entries by note text within a profile."
+  def search_entries_by_note(%Profile{} = profile, query) when is_binary(query) and query != "" do
+    pattern = "%#{query}%"
+
+    income_entries =
+      from(e in IncomeEntry,
+        join: s in IncomeSource, on: e.income_source_id == s.id,
+        join: c in IncomeCategory, on: s.income_category_id == c.id,
+        where: s.profile_id == ^profile.id and ilike(e.note, ^pattern),
+        select: %{type: "income", category: c.name, name: s.name, year: e.year, month: e.month, amount: e.amount, note: e.note}
+      )
+      |> Repo.all()
+
+    expense_entries =
+      from(e in ExpenseEntry,
+        join: t in ExpenseType, on: e.expense_type_id == t.id,
+        join: c in ExpenseCategory, on: t.expense_category_id == c.id,
+        where: t.profile_id == ^profile.id and ilike(e.note, ^pattern),
+        select: %{type: "expense", category: c.name, name: t.name, year: e.year, month: e.month, amount: e.amount, note: e.note}
+      )
+      |> Repo.all()
+
+    (income_entries ++ expense_entries)
+    |> Enum.sort_by(fn e -> {e.year, e.month} end, :desc)
+  end
+
+  def search_entries_by_note(%Profile{}, _query), do: []
+
+  ## Quick entry
+
+  @doc "Creates a sporadic expense entry in one step: finds or creates category and type, then inserts entry."
+  def quick_expense_entry(%Profile{} = profile, category_name, type_name, amount, year, month, note \\ nil) do
+    Repo.transaction(fn ->
+      category = find_or_create_expense_category!(profile, category_name)
+      type = find_or_create_expense_type!(profile, category, type_name)
+
+      {:ok, entry} = create_expense_entry(type, %{
+        "year" => year, "month" => month,
+        "amount" => amount, "note" => note
+      })
+
+      entry
+    end)
+  end
+
+  ## Recurring calendar
+
+  @doc "Returns a map of month => list of types/sources with gaps (months missing entries) for a year."
+  def recurring_calendar(%Profile{} = profile, year) do
+    income_sources =
+      IncomeSource
+      |> where(profile_id: ^profile.id, recurrence: :monthly)
+      |> Repo.all()
+
+    expense_types =
+      ExpenseType
+      |> where(profile_id: ^profile.id, recurrence: :monthly)
+      |> Repo.all()
+
+    income_entries =
+      IncomeEntry
+      |> where([e], e.income_source_id in ^Enum.map(income_sources, & &1.id) and e.year == ^year)
+      |> Repo.all()
+
+    expense_entries =
+      ExpenseEntry
+      |> where([e], e.expense_type_id in ^Enum.map(expense_types, & &1.id) and e.year == ^year)
+      |> Repo.all()
+
+    income_gaps =
+      for source <- income_sources, month <- 1..12 do
+        has_override = Enum.any?(income_entries, &(&1.income_source_id == source.id && &1.month == month))
+        if !has_override && source.base_amount != nil, do: nil, else: {source.name, :income, month, has_override}
+      end
+      |> Enum.reject(&is_nil/1)
+
+    expense_gaps =
+      for type <- expense_types, month <- 1..12 do
+        has_override = Enum.any?(expense_entries, &(&1.expense_type_id == type.id && &1.month == month))
+        if !has_override && type.base_amount != nil, do: nil, else: {type.name, :expense, month, has_override}
+      end
+      |> Enum.reject(&is_nil/1)
+
+    %{income: income_gaps, expense: expense_gaps, income_sources: income_sources, expense_types: expense_types}
   end
 
   defp months_until(from_date, to_date) do
